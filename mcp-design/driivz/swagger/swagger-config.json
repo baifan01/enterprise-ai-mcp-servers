@@ -1,0 +1,19 @@
+{
+  "configUrl": "/api-gateway/v3/api-docs/swagger-config",
+  "displayRequestDuration": false,
+  "docExpansion": "none",
+  "filter": "true",
+  "oauth2RedirectUrl": "https://apex-migration.driivz.com:8103/api-gateway/swagger-ui/oauth2-redirect.html",
+  "tagsSorter": "alpha",
+  "urls": [
+    {
+      "url": "/api-gateway/v3/api-docs/Admin-Operators",
+      "name": "Admin-Operators"
+    },
+    {
+      "url": "/api-gateway/v3/api-docs/Customers",
+      "name": "Customers"
+    }
+  ],
+  "validatorUrl": ""
+}

@@ -1,0 +1,4502 @@
+[
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/contracts",
+    "operationId": "addContractsTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Apply contract-related charge"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/credits",
+    "operationId": "addCreditTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Apply credit or debit"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/estimation",
+    "operationId": "connectorEstimatedCostCalculation_1",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Calculate estimated transaction cost for the account and connector"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/externalPayments",
+    "operationId": "addExternalPaymentTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Apply external payment"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/filter",
+    "operationId": "filterTransactions_4",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Finds billing transactions"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/penalties",
+    "operationId": "addPenaltyTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Apply penalty"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/refunds",
+    "operationId": "addRefundTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Apply refund"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/{id}",
+    "operationId": "getTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Get billing transaction details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/billing-transactions/{id}/lineItems",
+    "operationId": "getLineItemForTransaction",
+    "tags": [
+      "Account Billing Transactions"
+    ],
+    "summary": "Get line item details of billing transaction"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/cards/actions/order",
+    "operationId": "orderCard",
+    "tags": [
+      "Account Cards"
+    ],
+    "summary": "Order card"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/cards/allowed-for-start-transaction/filter",
+    "operationId": "filterAllowedCardsForStartTransaction",
+    "tags": [
+      "Account Cards"
+    ],
+    "summary": "Filter cards that are allowed for start transaction with connector for account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/cards/batch/assign",
+    "operationId": "batchAssign",
+    "tags": [
+      "Account Cards"
+    ],
+    "summary": "Assign batch of cards"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/cards/suspend",
+    "operationId": "suspendCards",
+    "tags": [
+      "Account Cards"
+    ],
+    "summary": "Suspend cards"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/cards/type/echarge/assign",
+    "operationId": "echargeAssign",
+    "tags": [
+      "Account Cards"
+    ],
+    "summary": "Assign eCharge card"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/cards/type/vehicleId/assign",
+    "operationId": "vehicleIdCardAssign",
+    "tags": [
+      "Account Cards"
+    ],
+    "summary": "Assign vehicle ID"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/charger-operations/chargers/{chargerIdentityKey}/connectors/{connectorIdentityKey}/auto-charge/enroll",
+    "operationId": "autoCharge",
+    "tags": [
+      "Account Charger Operations"
+    ],
+    "summary": "Enroll for autocharge"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/charging-ability/charging/status",
+    "operationId": "validateChargingStartStatus",
+    "tags": [
+      "Account Charging Capabilities"
+    ],
+    "summary": "Validate customer can charge at charger"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/charging-ability/reservation/status",
+    "operationId": "validateChargingAbilityReservation",
+    "tags": [
+      "Account Charging Capabilities"
+    ],
+    "summary": "Validate customer can reserve charger"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/charging-ability/status",
+    "operationId": "validateAccountBeforeCharging",
+    "tags": [
+      "Account Charging Capabilities"
+    ],
+    "summary": "Validate customer account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/contracts",
+    "operationId": "addContract",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Add contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/contracts/ad-hoc",
+    "operationId": "getAdHocContract",
+    "tags": [
+      "Account Ad-hoc Contracts"
+    ],
+    "summary": "Get ad hoc contract details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/contracts/ad-hoc",
+    "operationId": "addAdHocContract",
+    "tags": [
+      "Account Ad-hoc Contracts"
+    ],
+    "summary": "Add ad hoc contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/ad-hoc/credit",
+    "operationId": "updateAdHocContractCredit",
+    "tags": [
+      "Account Ad-hoc Contracts"
+    ],
+    "summary": "Update ad hoc credit amount"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/ad-hoc/status",
+    "operationId": "updateAdHocContractStatus",
+    "tags": [
+      "Account Ad-hoc Contracts"
+    ],
+    "summary": "Update ad hoc contract status"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/contracts/filter",
+    "operationId": "filterContracts_1",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Find contracts"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/contracts/{contractId}",
+    "operationId": "getContract",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Get contract details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/{contractId}",
+    "operationId": "updateContract",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Update contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/{contractId}/close",
+    "operationId": "closeContract",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Close contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/{contractId}/credit",
+    "operationId": "updateContractUsageCredit",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Update usage credit of contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/{contractId}/status",
+    "operationId": "updateContractStatus",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Update status of contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/contracts/{contractId}/swap",
+    "operationId": "swapContract",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Swap contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/customer-contracts/sponsored",
+    "operationId": "addSponsoredContract",
+    "tags": [
+      "Account Contracts"
+    ],
+    "summary": "Add sponsored contract"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/invoices/current/pdf",
+    "operationId": "getCurrentStatementAsPdf_1",
+    "tags": [
+      "Account Invoices"
+    ],
+    "summary": "Get current invoice as pdf"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/invoices/filter",
+    "operationId": "filterInvoices_1",
+    "tags": [
+      "Account Invoices"
+    ],
+    "summary": "Find invoices"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/invoices/{id}/markInvoiceAsPaid",
+    "operationId": "markInvoiceAsPaid",
+    "tags": [
+      "Account Invoices"
+    ],
+    "summary": "Mark invoice as paid"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/invoices/{id}/pdf",
+    "operationId": "getInvoicePdf_1",
+    "tags": [
+      "Account Invoices"
+    ],
+    "summary": "Get invoice as PDF"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/invoices/{id}/writeOffInvoice",
+    "operationId": "writeOffInvoice",
+    "tags": [
+      "Account Invoices"
+    ],
+    "summary": "Write off invoice"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/payment-methods/bank-account",
+    "operationId": "getBankAccountPayments",
+    "tags": [
+      "Account Payment Methods"
+    ],
+    "summary": "Get bank account payment method details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/accounts/{accountNumber}/payment-methods/payment-cards",
+    "operationId": "getPaymentCard",
+    "tags": [
+      "Account Payment Methods"
+    ],
+    "summary": "Get card payment method details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/payment-methods/payment-cards",
+    "operationId": "addCardPaymentMethod",
+    "tags": [
+      "Account Payment Methods"
+    ],
+    "summary": "Add card payment method"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/payment-methods/payment-cards/no-pay",
+    "operationId": "addNoPayCardPaymentMethod",
+    "tags": [
+      "Account Payment Methods"
+    ],
+    "summary": "Add no-pay card payment method"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/accounts/{accountNumber}/payment-methods/payment-cards/{id}",
+    "operationId": "deleteCreditCard",
+    "tags": [
+      "Account Payment Methods"
+    ],
+    "summary": "Delete card payment method"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/payment-methods/payment-cards/{id}/primary",
+    "operationId": "setPrimaryPaymentCard",
+    "tags": [
+      "Account Payment Methods"
+    ],
+    "summary": "Set payment card as primary"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/reservations/by-date",
+    "operationId": "createReservationByDate",
+    "tags": [
+      "Account Reservations"
+    ],
+    "summary": "Reserve charger in future"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/reservations/chargers",
+    "operationId": "getChargerForReservation",
+    "tags": [
+      "Account Reservations"
+    ],
+    "summary": "Find chargers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/reservations/now",
+    "operationId": "reserveNow",
+    "tags": [
+      "Account Reservations"
+    ],
+    "summary": "Reserve charger now"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/reservations/terms/byDate",
+    "operationId": "getReservationTermsByDate",
+    "tags": [
+      "Account Reservations"
+    ],
+    "summary": "Get terms for future reservation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/reservations/terms/now",
+    "operationId": "getReservationTermsNow",
+    "tags": [
+      "Account Reservations"
+    ],
+    "summary": "Get terms for immediate reservation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/accounts/{accountNumber}/reservations/{id}/cancel",
+    "operationId": "cancelReservation_1",
+    "tags": [
+      "Account Reservations"
+    ],
+    "summary": "Cancel reservation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/accounts/{accountNumber}/statements/filter",
+    "operationId": "filterStatements_1",
+    "tags": [
+      "Account Invoices"
+    ],
+    "summary": "Find statements"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/authentication/operator/customer-login",
+    "operationId": "operatorLoginAsCustomer",
+    "tags": [
+      "Authentication"
+    ],
+    "summary": "Operator login as customer"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/authentication/operator/login",
+    "operationId": "operatorLogin",
+    "tags": [
+      "Authentication"
+    ],
+    "summary": "Operator login"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/authorization/user/{id}/generate",
+    "operationId": "generateUserAuthorization",
+    "tags": [
+      "User Authorize"
+    ],
+    "summary": "Generate user authorization code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/billing-transactions/filter",
+    "operationId": "filterTransactions_3",
+    "tags": [
+      "Billing Transactions"
+    ],
+    "summary": "Find billing transactions"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/billing-transactions/one-time-payment/estimation",
+    "operationId": "connectorEstimatedCostCalculation",
+    "tags": [
+      "Billing Transactions"
+    ],
+    "summary": "Calculate estimated transaction cost from one time payment driver"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/cards/batch/import",
+    "operationId": "importBatch",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Import batch of cards"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/cards/batch/{id}",
+    "operationId": "getCardIdsFromBatch",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Get card IDs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/cards/filter",
+    "operationId": "filterCards",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Find cards"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/cards/{id}",
+    "operationId": "getCard",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Get card details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/cards/{id}/actions/attach",
+    "operationId": "attachCard",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Connect cards"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/cards/{id}/activate",
+    "operationId": "activateCard",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Activate card"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/cards/{id}/delete",
+    "operationId": "deleteCardById",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Delete card"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/cards/{id}/reassign",
+    "operationId": "reassign",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Reassign card"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/cards/{id}/status",
+    "operationId": "changeStatus",
+    "tags": [
+      "Cards"
+    ],
+    "summary": "Update card status"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-groups/root",
+    "operationId": "getChargerRootGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Find root group"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/charger-groups/{id}",
+    "operationId": "deleteChargerGroupById",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Delete charger group"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-groups/{id}",
+    "operationId": "getChargerGroupById",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Get charger group details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-groups/{id}",
+    "operationId": "updateChargerGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Update charger group"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-groups/{id}",
+    "operationId": "addChargerGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Create charger group"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-groups/{id}/billing-plans/add",
+    "operationId": "addBillingPlansToGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Add billing plans"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-groups/{id}/billing-plans/remove",
+    "operationId": "removeBillingPlansFromGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Remove billing plans"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-groups/{id}/chargers",
+    "operationId": "getChargerGroupChargersById",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Get charger details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-groups/{id}/chargers/add",
+    "operationId": "addChargersToGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Add chargers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-groups/{id}/chargers/remove",
+    "operationId": "removeChargersFromGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Remove chargers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-groups/{id}/folder",
+    "operationId": "addChargerGroupFolder",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Create folder"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-groups/{id}/reallocation",
+    "operationId": "reallocateChargerGroup",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Reallocate chargers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-hosts",
+    "operationId": "createChargerHost",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Create charger host"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-hosts/filter",
+    "operationId": "filterChargerHosts",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Find charger hosts"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/actions/activate",
+    "operationId": "activateChargerHostProfile",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Activate account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/actions/close",
+    "operationId": "closeChargerHostProfile",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Close account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/actions/reopen",
+    "operationId": "reopenChargerHostProfile",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Reopen account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/actions/suspend",
+    "operationId": "suspendChargerHostProfile",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Suspend account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/billing",
+    "operationId": "getChargerHostBilling",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get customer plan and contract details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/billing",
+    "operationId": "updateChargerHostBilling",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update customer plan and contract details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-hosts/{accountNumber}/billing-transactions/filter",
+    "operationId": "filterTransactions_2",
+    "tags": [
+      "Charger Host Transactions"
+    ],
+    "summary": "Find transactions"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/charger-hosts/{accountNumber}/country-currency/{countryCurrency}/entity",
+    "operationId": "deleteChargerHostEntity",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Delete a charger host entity"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/country-currency/{countryCurrency}/entity",
+    "operationId": "getChargerHostEntity_1",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Find charger host entity by account number and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/country-currency/{countryCurrency}/entity",
+    "operationId": "updateChargerHostEntity_1",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update a charger host entity by account number and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/currencies/{currency}/wallet",
+    "operationId": "getChargerHostAccount_1",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get billing details using currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/entity",
+    "operationId": "getChargerHostEntity",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Find charger host entity by account number "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/entity",
+    "operationId": "updateChargerHostEntity",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update a charger host entity by account number"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-hosts/{accountNumber}/invoices/current/pdf",
+    "operationId": "getCurrentStatementAsPdf",
+    "tags": [
+      "Charger Host Invoices"
+    ],
+    "summary": "Get current invoice as PDF"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-hosts/{accountNumber}/invoices/filter",
+    "operationId": "filterInvoices",
+    "tags": [
+      "Charger Host Invoices"
+    ],
+    "summary": "Find invoices"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/invoices/{id}/pdf",
+    "operationId": "getInvoicePdf",
+    "tags": [
+      "Charger Host Invoices"
+    ],
+    "summary": "Get invoice as PDF"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/payment-gateway",
+    "operationId": "getChargerHostPaymentGateway",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get payment gateway details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/payment-gateway",
+    "operationId": "updateChargerHostPaymentGateway",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update payment gateway details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/plan-management",
+    "operationId": "getChargerHostPlanManagement",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get plan management details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/profile",
+    "operationId": "getChargerHostProfile",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/profile",
+    "operationId": "updateChargerHostProfile",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-hosts/{accountNumber}/statements/filter",
+    "operationId": "filterStatements",
+    "tags": [
+      "Charger Host Statements"
+    ],
+    "summary": "Find statements"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{accountNumber}/wallet",
+    "operationId": "getChargerHostAccount",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get billing details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/wallet/billing-info",
+    "operationId": "updateWalletBillingInfo",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update billing information"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{accountNumber}/wallet/block-settings",
+    "operationId": "updateWalletBlockSettings",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Update block settings"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-hosts/{id}/plans",
+    "operationId": "getChargerHostPlans",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Get charging plans of host "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{id}/plans/add",
+    "operationId": "addChargerHostPlans",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Assign charging plans to a host "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-hosts/{id}/plans/remove",
+    "operationId": "removeChargerHostPlans",
+    "tags": [
+      "Charger Hosts"
+    ],
+    "summary": "Remove charging plans from host "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-model-presets/filter",
+    "operationId": "filterChargerModelPresets",
+    "tags": [
+      "Charger Model Presets"
+    ],
+    "summary": "Find charger model presets"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-models",
+    "operationId": "createChargerModel",
+    "tags": [
+      "Charger Models"
+    ],
+    "summary": "Create charger model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-models/filter",
+    "operationId": "filterChargerModel",
+    "tags": [
+      "Charger Models"
+    ],
+    "summary": "Find charger models"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/charger-models/{id}",
+    "operationId": "deleteModel",
+    "tags": [
+      "Charger Models"
+    ],
+    "summary": "Delete charger model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-models/{id}",
+    "operationId": "getChargerModel",
+    "tags": [
+      "Charger Models"
+    ],
+    "summary": "Get charger model details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-models/{id}",
+    "operationId": "updateChargerModel",
+    "tags": [
+      "Charger Models"
+    ],
+    "summary": "Update charger model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-models/{id}/connectors",
+    "operationId": "createChargerModelConnector",
+    "tags": [
+      "Charger Model Connectors"
+    ],
+    "summary": "Add connector"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/charger-models/{id}/connectors/{connectorId}",
+    "operationId": "deleteChargerModelConnector",
+    "tags": [
+      "Charger Model Connectors"
+    ],
+    "summary": "Delete connector"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-models/{id}/connectors/{connectorId}",
+    "operationId": "updateChargerModelConnector",
+    "tags": [
+      "Charger Model Connectors"
+    ],
+    "summary": "Update connector"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/charger-models/{id}/images/{imageId}",
+    "operationId": "deleteChargerModelImage",
+    "tags": [
+      "Charger Model Images"
+    ],
+    "summary": "Delete image"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/charger-models/{id}/images/{imageId}",
+    "operationId": "findResource",
+    "tags": [
+      "Charger Model Images"
+    ],
+    "summary": "Get image"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-models/{id}/images/{resourceId}",
+    "operationId": "addImageToChargerModel",
+    "tags": [
+      "Charger Model Images"
+    ],
+    "summary": "Add image"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/charger-models/{id}/protocols",
+    "operationId": "createModelProtocol",
+    "tags": [
+      "Charger Model Protocol"
+    ],
+    "summary": "Add protocol"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/charger-models/{id}/protocols/{protocolId}",
+    "operationId": "deleteModelProtocol",
+    "tags": [
+      "Charger Model Protocol"
+    ],
+    "summary": "Delete protocol"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/charger-models/{id}/protocols/{protocolId}",
+    "operationId": "updateModelProtocol",
+    "tags": [
+      "Charger Model Protocol"
+    ],
+    "summary": "Update protocol"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers",
+    "operationId": "addCharger",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Add charger"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/batch",
+    "operationId": "addChargers",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Create batch of chargers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/connection-log/filter",
+    "operationId": "filterChargerConnectionLog",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger connection logs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/one-time-payment-start-transaction",
+    "operationId": "startOneTImePaymentTransaction",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send guest driver start transaction command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/one-time-payment-stop-transaction",
+    "operationId": "stopOneTimePaymentTransaction",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send guest driver stop transaction command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/start-transaction",
+    "operationId": "startTransaction",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send start transaction command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/start-transaction-by-card-number",
+    "operationId": "startTransactionByCardNumber",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send start transaction command with card number"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/stop-transaction",
+    "operationId": "stopTransaction",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send stop transaction command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/stop-transaction-by-card-number",
+    "operationId": "stopTransactionByCardNumber",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send stop transaction command with card number"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/connectors/{connectorId}/remote-operations/unlock",
+    "operationId": "unlockConnector",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send unlock command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/detailed-log/chargers/{identityKey}",
+    "operationId": "findChargerDetailedLogsByIdentityKey",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger detailed logs by identity key"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/detailed-log/filter",
+    "operationId": "filterChargerDetailedLogs",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger detailed logs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/electrical/filter",
+    "operationId": "filterChargerElectrical",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find electrical details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/evses/{evseId}/remote-operations/start-transaction-by-card-number",
+    "operationId": "startEvseTransactionByCardNumber",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send start EVSE transaction command with card number"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/groups/{groupId}/remote-operations/raw",
+    "operationId": "sendRawMessage_1",
+    "tags": [
+      "Charger Group Remote Operations"
+    ],
+    "summary": "Send remote operation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/history/address/filter",
+    "operationId": "filter_10",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger address history "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/history/filter",
+    "operationId": "filter_9",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger history"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/identity-key/{identityKey}/history/filter",
+    "operationId": "filterByIdentityKey",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger history"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/locations/filter",
+    "operationId": "filterChargerLocation",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find charger locations"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/maintenance/filter",
+    "operationId": "filterChargerMaintenance",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find maintenance details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/networks/filter",
+    "operationId": "filterChargerNetwork",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find network details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/profiles/filter",
+    "operationId": "filterChargerProfile",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/statuses/filter",
+    "operationId": "filterChargerStatus",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Find status details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{chargerIdentityKey}/presets/{presetId}/apply",
+    "operationId": "applyChargerModelPreset",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Apply preset for charger by identity key and preset id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{chargerId}/configurations/history",
+    "operationId": "getConfigurationHistory",
+    "tags": [
+      "Charger Configuration"
+    ],
+    "summary": "Get charger configuration change history"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{chargerId}/connectors/{connectorId}/parking",
+    "operationId": "createConnectorParking",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Add vehicle access information"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/chargers/{chargerId}/connectors/{connectorId}/parking/{parkingId}",
+    "operationId": "deleteConnectorParking",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Delete vehicle access information"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{chargerId}/connectors/{connectorId}/parking/{parkingId}",
+    "operationId": "getConnectorParking",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Get vehicle access information"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{chargerId}/connectors/{connectorId}/parking/{parkingId}",
+    "operationId": "updateConnectorParking",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Update vehicle access information"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{chargerId}/connectors/{connectorId}/tariffs",
+    "operationId": "getConnectorTariff",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Get connector tariffs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{chargerId}/connectors/{connectorId}/tariffs",
+    "operationId": "updateConnectorTariff",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Update connector tariffs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/evses/{evseId}/allowed",
+    "operationId": "validateChargerConnectorEvseReplacement",
+    "tags": [
+      "Chargers Compound"
+    ],
+    "summary": "Validates whether the EVSE ID can be updated on a charger"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/remote-operations/charging-profile",
+    "operationId": "sendChargingProfileMessage",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send charging profile"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/remote-operations/configuration",
+    "operationId": "sendChangeConfigurationMessage",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send update configuration"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/remote-operations/configuration/filter",
+    "operationId": "findChargerConfigurationByFilter",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Get charger configuration by filter"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/remote-operations/get-diagnostics",
+    "operationId": "sendGetDiagnosticsMessage",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send get diagnostics command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/remote-operations/raw",
+    "operationId": "sendRawMessage",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send raw message"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/chargers/{identityKey}/remote-operations/reset",
+    "operationId": "sendResetMessage",
+    "tags": [
+      "Charger Remote Operations"
+    ],
+    "summary": "Send reset command"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/chargers/{id}",
+    "operationId": "deleteCharger",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Delete charger"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/actions/move-from-warehouse",
+    "operationId": "moveChargerFromWarehouse",
+    "tags": [
+      "Chargers Compound"
+    ],
+    "summary": "Move charger from warehouse "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/actions/move-to-warehouse",
+    "operationId": "moveChargerToWarehouse",
+    "tags": [
+      "Chargers Compound"
+    ],
+    "summary": "Move charger to warehouse "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/actions/replacement",
+    "operationId": "replacement",
+    "tags": [
+      "Chargers Compound"
+    ],
+    "summary": "Replace a Charger with stored warehouse charger"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/charger-groups",
+    "operationId": "getGroupsByChargerId",
+    "tags": [
+      "Charger Groups"
+    ],
+    "summary": "Find charger groups"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/connectors/{connectorId}",
+    "operationId": "updateChargerConnector",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Update connector details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/connectors/{connectorId}/actions/manual-status-update",
+    "operationId": "manualStatusUpdate",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Update connector status"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/connectors/{connectorId}/evse",
+    "operationId": "updateChargerConnectorEvse",
+    "tags": [
+      "Charger Connectors"
+    ],
+    "summary": "Update EVSE details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/electrical",
+    "operationId": "getChargerElectrical",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Get charger's electrical details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/electrical",
+    "operationId": "updateChargerElectrical",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's electrical details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/location",
+    "operationId": "getChargerLocation",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Get charger's location"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/location",
+    "operationId": "updateChargerLocation",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's location"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/maintenance",
+    "operationId": "getChargerMaintenance",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Get charger's maintenance details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/maintenance",
+    "operationId": "updateChargerMaintenance",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger’s maintenance details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/maintenance/actions/schedule-one-time-maintenance-date",
+    "operationId": "updateChargerMaintenanceNextDate",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update next charger maintenance  date"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/network",
+    "operationId": "getChargerNetwork",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Get charger’s network details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/network",
+    "operationId": "updateChargerNetwork",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's network details "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/profile",
+    "operationId": "getChargerProfile",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Get charger’s profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/profile",
+    "operationId": "updateChargerProfile",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/provision/status/change",
+    "operationId": "changeProvisionStatusByChargerId",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's provision status"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/set-connection-password",
+    "operationId": "setConnectionPassword",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Set charger connection password"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/chargers/{id}/status",
+    "operationId": "getChargerStatus",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Get charger's status"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/status/actions/decommission",
+    "operationId": "decommissionCharger",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's status to decommissioned"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/chargers/{id}/status/actions/provision",
+    "operationId": "provisionCharger",
+    "tags": [
+      "Chargers"
+    ],
+    "summary": "Update charger's status to provisioned"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/companies",
+    "operationId": "addCompany",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Add company"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/companies/filter",
+    "operationId": "filter_8",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Find companies"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/companies/{id}",
+    "operationId": "deleteCompany",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Delete company"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/companies/{id}",
+    "operationId": "getCompany",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Get company details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/companies/{id}",
+    "operationId": "updateCompany",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Update company"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/companies/{id}/person/add",
+    "operationId": "addPersonToCompany",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Add person to company"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/companies/{id}/person/remove",
+    "operationId": "removePersonFromCompany",
+    "tags": [
+      "Companies"
+    ],
+    "summary": "Remove person from company"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/configurations/external-card-authorization-providers",
+    "operationId": "getExternalCardAuthorizationProvider",
+    "tags": [
+      "Configurations"
+    ],
+    "summary": "Get external card authorization providers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/configurations/filter",
+    "operationId": "filter_7",
+    "tags": [
+      "Configurations"
+    ],
+    "summary": "Find configuration parameters"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/configurations/{id}",
+    "operationId": "getConfigurationById",
+    "tags": [
+      "Configurations"
+    ],
+    "summary": "Get configuration parameter"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/configurations/{id}",
+    "operationId": "update_1",
+    "tags": [
+      "Configurations"
+    ],
+    "summary": "Update configuration parameter"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/connector-types/filter",
+    "operationId": "filter_6",
+    "tags": [
+      "Connector Types"
+    ],
+    "summary": "Find connector types"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/contact-people",
+    "operationId": "createPerson",
+    "tags": [
+      "Contact People"
+    ],
+    "summary": "Create contact person"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/contact-people/filter",
+    "operationId": "filterContactPeople",
+    "tags": [
+      "Contact People"
+    ],
+    "summary": "Find contact people"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/contact-people/{id}",
+    "operationId": "getContactPerson",
+    "tags": [
+      "Contact People"
+    ],
+    "summary": "Get contact person details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/country-currencies/filter",
+    "operationId": "filter_5",
+    "tags": [
+      "Country Currencies"
+    ],
+    "summary": "Find country currencies"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/country-currencies/{id}",
+    "operationId": "getCountryCurrency",
+    "tags": [
+      "Country Currencies"
+    ],
+    "summary": "Get country currency details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/custom-integrations/cdrs/filter",
+    "operationId": "filter_4",
+    "tags": [
+      "Custom Integrations"
+    ],
+    "summary": "Find EV transactions in cdr format"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-accounts",
+    "operationId": "addCustomer",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Create customer account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-accounts/filter",
+    "operationId": "filterCustomerAccounts",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Find accounts"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-accounts/members/filter",
+    "operationId": "filterMembers",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Find members"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-accounts/members/{accountNumber}",
+    "operationId": "deleteMemberByAccountNumber",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Delete member"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/members/{accountNumber}/actions/suspend",
+    "operationId": "suspendMemberByAccountNumber",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Suspend member"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/members/{accountNumber}/actions/unsuspend",
+    "operationId": "unsuspendMemberByAccountNumber",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Restore member"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-accounts/members/{accountNumber}/profile",
+    "operationId": "getMember",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Get member details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/members/{accountNumber}/profile",
+    "operationId": "updateMemberByAccountNumber",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Update member details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-accounts/no-billing-info",
+    "operationId": "addCustomerWithoutBillingInfo",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Create customer account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/actions/activate",
+    "operationId": "activateRegisteredAccount",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Activate account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/actions/close",
+    "operationId": "close",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Close account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/actions/reopen",
+    "operationId": "reopenAccount",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Reopen account"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-accounts/{accountNumber}/notifications-preferences",
+    "operationId": "getNotificationPreferences",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Get notification preferences"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/notifications-preferences",
+    "operationId": "updateNotificationPreferences_1",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Update notification preferences"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-accounts/{accountNumber}/profile",
+    "operationId": "getCustomerAccount",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Get customer account details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/profile",
+    "operationId": "updateCustomerProfile",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Update customer account details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-accounts/{accountNumber}/wallet",
+    "operationId": "getAccountWallet",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Get account wallet"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/wallet",
+    "operationId": "updateCustomerWallet",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Update account wallet"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/wallet/billing-cycle",
+    "operationId": "updateAccountBillingCycle",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Update billing cycle"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/wallet/block-settings",
+    "operationId": "updateAccountWalletBlockSettings",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Update block settings"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-accounts/{accountNumber}/wallet/charging-configuration",
+    "operationId": "updateChargingConfiguration",
+    "tags": [
+      "Customer Accounts"
+    ],
+    "summary": "Update charging configuration"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-accounts/{payingAccountNumber}/members",
+    "operationId": "addMember",
+    "tags": [
+      "Customer Member Accounts"
+    ],
+    "summary": "Add member"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-contracts/filter",
+    "operationId": "filterContracts",
+    "tags": [
+      "Customer Contracts"
+    ],
+    "summary": "Find contracts"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-contracts/host/account/{chargerHostAccountNumber}/department/{departmentId}/drivers/contracts",
+    "operationId": "createContractToDepartmentGroupOfDrivers",
+    "tags": [
+      "Customer Contracts"
+    ],
+    "summary": "Create a contract to a department of drivers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-contracts/host/account/{chargerHostAccountNumber}/drivers/contracts",
+    "operationId": "createContractToHostDrivers",
+    "tags": [
+      "Customer Contracts"
+    ],
+    "summary": "Create a contract to host drivers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans",
+    "operationId": "createPlan",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Create plan"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/profiles/filter",
+    "operationId": "filterPlanProfile",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Find profiles"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/activate",
+    "operationId": "activatePlan",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Activate plan"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/activate",
+    "operationId": "activatePlanByCountryCurrency",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Activate plan with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/deactivate",
+    "operationId": "deactivatePlanByCountryCurrency",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Deactivate plan with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/display",
+    "operationId": "getPlanDisplayByCodeCountryCurrency",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Get plan display details with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/display",
+    "operationId": "updatePlanDisplayByCodeCountryCurrency",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Update plan display details with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility",
+    "operationId": "getPlanEligibilityByCountryCurrency_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Get a customer plan eligibility by plan code and country-currency with pagination support"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility",
+    "operationId": "updatePlanEligibility_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Update a customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/disable",
+    "operationId": "disablePlanEligibility_2",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Disable customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/enable",
+    "operationId": "enablePlanEligibility_2",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Enable customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/identifiers",
+    "operationId": "addPlanEligibilityIdentifiers_2",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Add identifiers to a customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/identifiers/{identifierId}",
+    "operationId": "deletePlanEligibilityIdentifier_2",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Delete an identifier from plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/registration-display",
+    "operationId": "getPlanRegistrationDisplayByCountryCurrency",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Get plan registration display details with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/registration-display",
+    "operationId": "updatePlanRegistrationDisplayByCountryCurrency",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Update plan registration display details with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/products",
+    "operationId": "getBillingPlanProductsByCountryCurrency",
+    "tags": [
+      "Customer Plan Products"
+    ],
+    "summary": "Get plan products with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/products/update",
+    "operationId": "updatePlanProduct_1",
+    "tags": [
+      "Customer Plan Products"
+    ],
+    "summary": "Update plan products with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/profile",
+    "operationId": "getPlanProfileByCountryCurrency",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Get profile details with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/profile",
+    "operationId": "updatePlanByCountryCurrency",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Update profile details with country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/tariffs/charger-groups/all",
+    "operationId": "getBillingPlanTariffsForAllGroupsByCodeCountryCurrency",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Get plan tariff details for all charger groups with specific country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/country-currency/{countryCurrency}/tariffs/charger-groups/{chargerGroupId}",
+    "operationId": "getBillingPlanGroupTariffsByCodeCountryCurrency",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Get plan tariff details for specific charger group and country currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/deactivate",
+    "operationId": "deactivatePlan",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Deactivate plan"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/discount",
+    "operationId": "getPlanDiscountByCode",
+    "tags": [
+      "Customer Plans Discount"
+    ],
+    "summary": "Get plan discount details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/discount",
+    "operationId": "updatePlanDiscountByCode",
+    "tags": [
+      "Customer Plans Discount"
+    ],
+    "summary": "Update plan discount details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/display",
+    "operationId": "getPlanDisplayByCode",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Get plan display details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/display",
+    "operationId": "updatePrimaryPlanDisplay",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Update plan display details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/eligibility",
+    "operationId": "getPlanEligibility_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Get a customer plan eligibility by plan code with pagination support"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/eligibility",
+    "operationId": "updatePlan_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Update a customer plan eligibility by plan code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/eligibility/disable",
+    "operationId": "disablePlanEligibility_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Disable customer plan eligibility"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/eligibility/enable",
+    "operationId": "enablePlanEligibility_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Enable customer plan eligibility"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/eligibility/identifiers",
+    "operationId": "addPlanEligibilityIdentifiers_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Add identifiers to a customer plan eligibility by plan code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/eligibility/identifiers/{identifierId}",
+    "operationId": "deletePlanEligibilityIdentifier_1",
+    "tags": [
+      "Customer Plans Eligibility (Deprecated)"
+    ],
+    "summary": "Delete an identifier from plan eligibility by plan code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/registration-display",
+    "operationId": "getPlanRegistrationDisplay",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Get plan registration display details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/locales/{locale}/registration-display",
+    "operationId": "updatePlanRegistrationDisplay",
+    "tags": [
+      "Customer Plan Displays"
+    ],
+    "summary": "Update plan registration display details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/products",
+    "operationId": "getBillingPlanProducts",
+    "tags": [
+      "Customer Plan Products"
+    ],
+    "summary": "Get products"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/{planCode}/products",
+    "operationId": "addPlanProduct",
+    "tags": [
+      "Customer Plan Products"
+    ],
+    "summary": "Add product"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/products/remove",
+    "operationId": "removePlanProduct",
+    "tags": [
+      "Customer Plan Products"
+    ],
+    "summary": "Remove product"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/products/update",
+    "operationId": "updatePlanProduct",
+    "tags": [
+      "Customer Plan Products"
+    ],
+    "summary": "Update product"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/profile",
+    "operationId": "getPlanProfile",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Get profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-plans/{planCode}/profile",
+    "operationId": "updatePlan",
+    "tags": [
+      "Customer Plans"
+    ],
+    "summary": "Update profile details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/all",
+    "operationId": "getBillingPlanTariffsForAllGroupsByCode",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Get plan tariff details for all charger groups"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PUT",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/all",
+    "operationId": "updatePlanGroupTariffsByCode_1",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Update plan tariff details for all charger groups"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/all/batch/{id}/add",
+    "operationId": "addChargerGroupAllToBatch",
+    "tags": [
+      "Customer Plan Tariffs - Batch"
+    ],
+    "summary": "Add an update action of plan tariff details for all groups for a charger plan to the active batch"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/batch",
+    "operationId": "openBillingPlanTariffsBatch",
+    "tags": [
+      "Customer Plan Tariffs - Batch"
+    ],
+    "summary": "Open a batch for open plan tariff details and group for a charger plan"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/batch/{id}",
+    "operationId": "getBillingPlanTariffsBatch",
+    "tags": [
+      "Customer Plan Tariffs - Batch"
+    ],
+    "summary": "Get the active batch details for open plan tariff details and group for a charger plan."
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/batch/{id}/execute",
+    "operationId": "executeChargerGroupBatch",
+    "tags": [
+      "Customer Plan Tariffs - Batch"
+    ],
+    "summary": "Execute the active batch for updating plan tariff details and group for a charger plan"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/batch/{id}/rollback",
+    "operationId": "rollBackChargerGroupBatch",
+    "tags": [
+      "Customer Plan Tariffs - Batch"
+    ],
+    "summary": "Roll back the active batch for updating plan tariff details and group for a charger plan"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/{chargerGroupId}",
+    "operationId": "getBillingPlanGroupTariffsByCode",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Get plan tariff details for specific charger group"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PUT",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/{chargerGroupId}",
+    "operationId": "updatePlanGroupTariffsByCode",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Update plan tariff details for specific charger group"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-groups/{chargerGroupId}/batch/{id}/add",
+    "operationId": "addChargerGroupToBatch",
+    "tags": [
+      "Customer Plan Tariffs - Batch"
+    ],
+    "summary": "Add an update action of plan tariff details and group for a charger plan to the active batch"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-speed/{chargerSpeed}/charger-groups/all",
+    "operationId": "deletePlanGroupTariffsByCodeAndSpeed_1",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Delete plan tariffs for all charger groups with specific charger speed"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-plans/{planCode}/tariffs/charger-speed/{chargerSpeed}/charger-groups/{chargerGroupId}",
+    "operationId": "deletePlanGroupTariffsByCodeAndSpeed",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Delete plan tariffs for specific charger group and charger speed"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-plans/{planCode}/tariffs/connector-type/{connectorType}/charger-groups/all",
+    "operationId": "deletePlanGroupTariffsByCodeAndConnectorType_1",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Delete plan tariffs for all charger groups with specific connector type"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-plans/{planCode}/tariffs/connector-type/{connectorType}/charger-groups/{chargerGroupId}",
+    "operationId": "deletePlanGroupTariffsByCodeAndConnectorType",
+    "tags": [
+      "Customer Plan Tariffs"
+    ],
+    "summary": "Delete plan tariffs for specific charger group and connector type"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-tariffs",
+    "operationId": "addCustomerTariff",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Create customer tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-tariffs/filter",
+    "operationId": "filter_3",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Find customer tariffs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-tariffs/schedule/create",
+    "operationId": "addCustomerScheduledTariff",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Create customer scheduled tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-tariffs/schedule/delete",
+    "operationId": "deleteCustomerTariffScheduling",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Delete billing tariff scheduling"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-tariffs/schedule/now",
+    "operationId": "applyCustomerTariffScheduling",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Apply billing tariff scheduling"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-tariffs/{id}",
+    "operationId": "getCustomerTariff",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Get customer tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-tariffs/{id}",
+    "operationId": "updateCustomerTariff",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Update customer tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-tariffs/{id}/history/filter",
+    "operationId": "filter_2",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Find previous customer tariffs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-tariffs/{id}/reservations",
+    "operationId": "getCustomerReservationTariff",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Get reservation tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-tariffs/{id}/reservations/by-date",
+    "operationId": "updateCustomerReservationTariffByDate",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Update future reservation tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-tariffs/{id}/reservations/now",
+    "operationId": "updateCustomerReservationTariffNow",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Update immediate reservation tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/customer-tariffs/{id}/reservations/now/terms",
+    "operationId": "createCustomerReservationTariffTerm",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Create immediate reservation tariff terms"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/customer-tariffs/{id}/reservations/now/terms/{termId}",
+    "operationId": "deleteCustomerReservationTariffTerm",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Delete immediate reservation tariff terms"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-tariffs/{id}/reservations/now/terms/{termId}",
+    "operationId": "updateCustomerReservationTariffTerm",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Update immediate reservation tariff terms"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/customer-tariffs/{id}/schedule",
+    "operationId": "getCustomerTariffScheduling",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Get customer tariff scheduling"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/customer-tariffs/{id}/schedule",
+    "operationId": "updateCustomerTariffScheduling",
+    "tags": [
+      "Customer Tariffs"
+    ],
+    "summary": "Update customer tariff scheduling"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/energy-storage",
+    "operationId": "createEnergyStorage",
+    "tags": [
+      "Energy Storage"
+    ],
+    "summary": "Create energy storage configuration"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/energy-storage/filter",
+    "operationId": "findByFilter",
+    "tags": [
+      "Energy Storage"
+    ],
+    "summary": "Filter energy storage configuration"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/energy-storage/{id}",
+    "operationId": "deleteById",
+    "tags": [
+      "Energy Storage"
+    ],
+    "summary": "Delete energy storage configuration by id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/energy-storage/{id}",
+    "operationId": "getEnergyStorage",
+    "tags": [
+      "Energy Storage"
+    ],
+    "summary": "Get energy storage by id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/energy-storage/{id}",
+    "operationId": "updateById",
+    "tags": [
+      "Energy Storage"
+    ],
+    "summary": "Update energy storage configuration by id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/energy-storage/{id}/actions/status",
+    "operationId": "status",
+    "tags": [
+      "Energy Storage"
+    ],
+    "summary": "Update energy storage status by id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/ev-transactions/chargers/{identityKey}/filter",
+    "operationId": "filterEvTransactionsByIdentityKey",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Find EV transactions by identity key"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/ev-transactions/cost-breakdown",
+    "operationId": "getCostBreakdown",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Get ev transactions cost breakdown"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/ev-transactions/filter",
+    "operationId": "filterEvTransactions",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Find EV transactions"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/ev-transactions/last",
+    "operationId": "getLastEvTransactions",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Find last EV transactions"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/ev-transactions/ocpi-cdrs/filter",
+    "operationId": "filterTransactions_1",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Find roaming CDRs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/ev-transactions/roaming-shell-cdrs/filter",
+    "operationId": "filterTransactions",
+    "tags": [
+      "Custom Integrations"
+    ],
+    "summary": "Find Shell roaming CDRs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/ev-transactions/{id}",
+    "operationId": "getEvTransaction",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Get EV transaction details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/ev-transactions/{id}/cost",
+    "operationId": "getEvTransactionCost",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Get EV transaction cost"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/ev-transactions/{id}/cost-breakdown/pdf",
+    "operationId": "getCostBreakdownPdf",
+    "tags": [
+      "EV Transactions"
+    ],
+    "summary": "Get ev transaction Cost Breakdown as PDF"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/fiscalization/invoices/{id}",
+    "operationId": "getFiscalizationData",
+    "tags": [
+      "Fiscalization"
+    ],
+    "summary": "Get fiscalization data by invoice id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/guest-driver-details/filter",
+    "operationId": "getGuestDriverDetails",
+    "tags": [
+      "Guest Driver Details"
+    ],
+    "summary": "Find guest driver details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/interface-log/migrate",
+    "operationId": "migrateInterfaceLogData",
+    "tags": [
+      "Inteface-log"
+    ],
+    "summary": "Migrate interface-logs by date range"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/oems",
+    "operationId": "addVehicle_1",
+    "tags": [
+      "Oems"
+    ],
+    "summary": "Add OEM"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/operators",
+    "operationId": "addOperator",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Add operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/operators/filter",
+    "operationId": "filterOperators",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Find operators"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/operators/{id}",
+    "operationId": "deleteOperatorById",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Delete operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/operators/{id}",
+    "operationId": "getOperator",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Find operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/operators/{id}",
+    "operationId": "updateOperator",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Update operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/operators/{id}/reactivate",
+    "operationId": "reactivate",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Reactivate operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/operators/{id}/suspend",
+    "operationId": "suspend",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Suspend operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/operators/{id}/unblock",
+    "operationId": "unblockOperator",
+    "tags": [
+      "Operators"
+    ],
+    "summary": "Unblock operator"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/payment-gateway/custom-fields/batch",
+    "operationId": "batchInsert",
+    "tags": [
+      "Payment Gateway"
+    ],
+    "summary": "Create batch of custom fields"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/payment-gateway/custom-fields/filter",
+    "operationId": "getCustomFieldsByFilter",
+    "tags": [
+      "Payment Gateway"
+    ],
+    "summary": "Find custom fields"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/payment-gateway/custom-fields/{id}",
+    "operationId": "deleteCustomField",
+    "tags": [
+      "Payment Gateway"
+    ],
+    "summary": "Delete custom field"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/payment-gateway/custom-fields/{id}",
+    "operationId": "updateCustomField",
+    "tags": [
+      "Payment Gateway"
+    ],
+    "summary": "Update custom field"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/properties",
+    "operationId": "addProperty",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Create property"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/properties/batch",
+    "operationId": "addProperties",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Create properties"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/properties/filter",
+    "operationId": "filterProperties",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Find properties"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/properties/{id}",
+    "operationId": "deletePropertyById",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Delete property"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/properties/{id}",
+    "operationId": "getProperty",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Find property"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/properties/{id}",
+    "operationId": "updateProperty",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Update property"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/properties/{id}/actions/refresh-runtime-engine",
+    "operationId": "refreshRuntimeEngine_1",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Refresh property engine"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/properties/{id}/energy-policies",
+    "operationId": "deletePropertyById_1",
+    "tags": [
+      "Property Energy Policies"
+    ],
+    "summary": "Delete energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/properties/{id}/energy-policies",
+    "operationId": "getPolicy_1",
+    "tags": [
+      "Property Energy Policies"
+    ],
+    "summary": "Find energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/properties/{id}/energy-policies",
+    "operationId": "updatePolicy_1",
+    "tags": [
+      "Property Energy Policies"
+    ],
+    "summary": "Update energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/properties/{id}/energy-policies",
+    "operationId": "addPolicy_1",
+    "tags": [
+      "Property Energy Policies"
+    ],
+    "summary": "Add energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/properties/{id}/external",
+    "operationId": "updateExternalProperty",
+    "tags": [
+      "Properties"
+    ],
+    "summary": "Update external property"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/raw-logs/migrate",
+    "operationId": "migrateRawLogs",
+    "tags": [
+      "Raw Logs"
+    ],
+    "summary": "Send raw logs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/regulation/nevi/error-codes",
+    "operationId": "getTransactionsErrorCodes",
+    "tags": [
+      "Regulations"
+    ],
+    "summary": "(NON-PROD) Find Nevi transactions error codes"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/regulation/nevi/peak-power",
+    "operationId": "filterEvTransactionsPeakPower",
+    "tags": [
+      "Regulations"
+    ],
+    "summary": "(NON-PROD) Find Nevi transactions peak kW"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/regulation/nevi/status-change-history",
+    "operationId": "findStatusChangeHistory",
+    "tags": [
+      "Regulations"
+    ],
+    "summary": "(NON-PROD) Find Nevi charger status change history"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/reservations/filter",
+    "operationId": "filterReservations",
+    "tags": [
+      "Reservations"
+    ],
+    "summary": "Find reservations"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/reservations/{id}",
+    "operationId": "getReservation",
+    "tags": [
+      "Reservations"
+    ],
+    "summary": "Get reservation details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/resources",
+    "operationId": "uploadFiles",
+    "tags": [
+      "Resources"
+    ],
+    "summary": "Upload files"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/site-map/accounts/{accountNumber}/chargers",
+    "operationId": "getChargersDataForAccount",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve multiple chargers data"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/site-map/accounts/{accountNumber}/chargers/{chargerId}",
+    "operationId": "getSingleChargerDataForAccount",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve single station site map data"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/site-map/accounts/{accountNumber}/cluster",
+    "operationId": "getSiteClustersForAccount",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve site map clusters"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/site-map/accounts/{accountNumber}/sites",
+    "operationId": "getSitesDataForAccount",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve site map clusters"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/site-map/anonymous/chargers",
+    "operationId": "getChargersDataForAnonymous",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve site map clusters"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/site-map/anonymous/chargers/{chargerId}",
+    "operationId": "getSingleChargerDataForAnonymous",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve single station site map data"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/site-map/anonymous/cluster",
+    "operationId": "getSiteClustersForAnonymous",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve site map clusters"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/site-map/anonymous/sites",
+    "operationId": "getSitesDataForAnonymous",
+    "tags": [
+      "Site Map"
+    ],
+    "summary": "Retrieve site map clusters"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites",
+    "operationId": "addSite",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Create site"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/batch",
+    "operationId": "addSites",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Create sites"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/filter",
+    "operationId": "filterSites",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Find sites"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/history/charger/filter",
+    "operationId": "filterSiteChargersHistory",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Get chargers update site history by filter"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/history/filter",
+    "operationId": "filterSitesHistory",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Get site history by filter"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/search",
+    "operationId": "searchSites",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Search sites"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/vehicles-schedule/enrich",
+    "operationId": "enrichScheduleRecords",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Enrich vehicles schedule records"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/sites/{id}",
+    "operationId": "deleteSiteById_1",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Delete site"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/sites/{id}",
+    "operationId": "getSite",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Find site"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{id}",
+    "operationId": "updateSite",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Update site"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{id}/actions/refresh-runtime-engine",
+    "operationId": "refreshRuntimeEngine",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Refresh site engine"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/sites/{id}/energy-policies",
+    "operationId": "deleteSiteEnergyPolicyBySiteId",
+    "tags": [
+      "Site Energy Policies"
+    ],
+    "summary": "Delete energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/sites/{id}/energy-policies",
+    "operationId": "getPolicy",
+    "tags": [
+      "Site Energy Policies"
+    ],
+    "summary": "Find energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{id}/energy-policies",
+    "operationId": "updatePolicy",
+    "tags": [
+      "Site Energy Policies"
+    ],
+    "summary": "Update energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{id}/energy-policies",
+    "operationId": "addPolicy",
+    "tags": [
+      "Site Energy Policies"
+    ],
+    "summary": "Add energy policy"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/sites/{id}/evses/{evseId}/allowed",
+    "operationId": "validateEvseReplacement",
+    "tags": [
+      "Chargers Compound"
+    ],
+    "summary": "Validate EVSE id for charger replacement in a site"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{id}/external",
+    "operationId": "updateExternalSite",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Update external site"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{id}/history/override-records/filter",
+    "operationId": "getSiteHistoryOverrideRecords",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Get site history override records"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{id}/history/{historyId}/override",
+    "operationId": "updateHistory",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Update date of site history record"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/sites/{id}/resources/{resourceId}",
+    "operationId": "deleteSiteResource",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Delete resource"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/sites/{id}/resources/{resourceId}",
+    "operationId": "findSiteResource",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Get resource"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{id}/resources/{resourceId}",
+    "operationId": "updateSiteResource",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Update resource"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{id}/resources/{resourceId}",
+    "operationId": "addResourceToSite",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Add resource"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{id}/schedules/import",
+    "operationId": "loadVehiclesSchedule",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Add vehicles schedule to a given site by a CSV file "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/sites/{id}/summary",
+    "operationId": "getSiteSummary",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "Get site history summary "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/actions/calculate-planning",
+    "operationId": "calculatePlanning",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "calculate planning"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/actions/cancel-reservation",
+    "operationId": "cancelReservation",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "cancel reservation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/actions/schedule",
+    "operationId": "saveSchedule",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "saving schedule"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/energy-planning/calculate",
+    "operationId": "calcEnergyPlanning",
+    "tags": [
+      "Grid Management"
+    ],
+    "summary": "Calculate energy planning"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{siteId}/energy-planning/calculate-planning-update",
+    "operationId": "calculateEnergyPlanningForUpdate",
+    "tags": [
+      "Grid Management"
+    ],
+    "summary": "Calculate energy planning for update"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/energy-planning/calculate-simulation",
+    "operationId": "simulateEnergyPlanningCalculation",
+    "tags": [
+      "Grid Management"
+    ],
+    "summary": "Calculate energy planning simulation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{siteId}/energy-planning/calculate-simulation-for-update",
+    "operationId": "simulateEnergyPlanningCalculationForUpdate",
+    "tags": [
+      "Grid Management"
+    ],
+    "summary": "Calculate energy planning simulation for update"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/sites/{siteId}/energy-planning/result",
+    "operationId": "getLastEnergyPlanningResult",
+    "tags": [
+      "Grid Management"
+    ],
+    "summary": "Get last energy planning result"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/schedule/actions/simulate-validation",
+    "operationId": "validateScheduleForSimulation",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "validating schedule for simulation"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/schedule/actions/validate",
+    "operationId": "validateSchedule",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "validating schedule"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/sites/{siteId}/schedule/actions/validate-csv",
+    "operationId": "validateCsvSchedule",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "validating schedule "
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/sites/{siteId}/schedule/{scheduleId}/actions/validate-for-update",
+    "operationId": "validateScheduleUpdate",
+    "tags": [
+      "Sites"
+    ],
+    "summary": "validating schedule for update planning"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/soc-data",
+    "operationId": "submitSocData",
+    "tags": [
+      "SOC Data"
+    ],
+    "summary": "Submit SOC data"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/topologies",
+    "operationId": "getTopologies",
+    "tags": [
+      "Topologies"
+    ],
+    "summary": "Get all topologies"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/topologies",
+    "operationId": "createTopology",
+    "tags": [
+      "Topologies"
+    ],
+    "summary": "Create topology"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/topologies/simple",
+    "operationId": "createSimpleTopology",
+    "tags": [
+      "Topologies"
+    ],
+    "summary": "Create simple topology"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/topologies/{id}",
+    "operationId": "deleteTopology",
+    "tags": [
+      "Topologies"
+    ],
+    "summary": "Delete topology"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/topologies/{id}",
+    "operationId": "getTopology",
+    "tags": [
+      "Topologies"
+    ],
+    "summary": "Get topology details"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PUT",
+    "path": "/v1/topologies/{id}",
+    "operationId": "updateTopology",
+    "tags": [
+      "Topologies"
+    ],
+    "summary": "Update topology"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/user-notifications-preferences/{userId}",
+    "operationId": "updateNotificationPreferences",
+    "tags": [
+      "User Notification Preferences"
+    ],
+    "summary": "Update notification preferences"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/utility-tariffs",
+    "operationId": "createUtilityTariff",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Create utility tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/utility-tariffs/filter",
+    "operationId": "filter_1",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Find utility tariffs"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/utility-tariffs/time-ranges",
+    "operationId": "updateUtilityTariffTimeRanges",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Update utility tariff time ranges"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/utility-tariffs/time-ranges",
+    "operationId": "createUtilityTariffTimeRanges",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Create utility tariff time ranges"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/utility-tariffs/time-ranges/filter",
+    "operationId": "filter",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Find utility tariffs time ranges by filter"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/utility-tariffs/{id}",
+    "operationId": "deleteUtilityTariffById",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Delete utility tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/utility-tariffs/{id}",
+    "operationId": "getUtilityTariff",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Get utility tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/utility-tariffs/{id}",
+    "operationId": "updateUtilityTariff",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Update utility tariff"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/utility-tariffs/{id}/time-ranges",
+    "operationId": "deleteUtilityTariffTimeRanges",
+    "tags": [
+      "Utility Tariffs"
+    ],
+    "summary": "Delete utility tariff time ranges"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vdas",
+    "operationId": "create",
+    "tags": [
+      "VDA"
+    ],
+    "summary": "Create a vda"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vdas-attachment",
+    "operationId": "create_1",
+    "tags": [
+      "VDA-Attachment"
+    ],
+    "summary": "Create a vda attachment"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vdas-attachment/delete",
+    "operationId": "delete_1",
+    "tags": [
+      "VDA-Attachment"
+    ],
+    "summary": "Delete vda attachments by ids"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vdas-attachment/filter",
+    "operationId": "filterVdaAttachment",
+    "tags": [
+      "VDA-Attachment"
+    ],
+    "summary": "Find vdas by vda attachment properties"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/vdas-attachment/{id}",
+    "operationId": "deleteVdaAttachment",
+    "tags": [
+      "VDA-Attachment"
+    ],
+    "summary": "Delete vda attachment by id"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/vdas-attachment/{id}",
+    "operationId": "update",
+    "tags": [
+      "VDA-Attachment"
+    ],
+    "summary": "Update a vda attachment"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vdas/delete",
+    "operationId": "delete",
+    "tags": [
+      "VDA"
+    ],
+    "summary": "Delete vdas by ids"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vdas/filter",
+    "operationId": "filterVda",
+    "tags": [
+      "VDA"
+    ],
+    "summary": "Find vdas"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/vdas/{id}",
+    "operationId": "deleteSiteById",
+    "tags": [
+      "VDA"
+    ],
+    "summary": "Delete a vda"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/vdas/{id}",
+    "operationId": "getVda",
+    "tags": [
+      "VDA"
+    ],
+    "summary": "Find vda"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicle-manufacturers",
+    "operationId": "createVehicleManufacturer",
+    "tags": [
+      "Vehicle Manufacturers"
+    ],
+    "summary": "Add vehicle manufacturer"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicle-manufacturers/filter",
+    "operationId": "filterVehicleManufacturer",
+    "tags": [
+      "Vehicle Manufacturers"
+    ],
+    "summary": "Find vehicle manufacturers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/vehicle-manufacturers/{id}",
+    "operationId": "deleteVehicleManufacturerById",
+    "tags": [
+      "Vehicle Manufacturers"
+    ],
+    "summary": "Delete vehicle manufacturer"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/vehicle-manufacturers/{id}",
+    "operationId": "getVehicleManufacturerById",
+    "tags": [
+      "Vehicle Manufacturers"
+    ],
+    "summary": "Get vehicle manufacturer"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/vehicle-manufacturers/{id}",
+    "operationId": "updateVehicleManufacturer",
+    "tags": [
+      "Vehicle Manufacturers"
+    ],
+    "summary": "Update vehicle manufacturer"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicle-models",
+    "operationId": "addVehicleModel",
+    "tags": [
+      "Vehicle Models"
+    ],
+    "summary": "Add vehicle model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicle-models/filter",
+    "operationId": "filterVehicleModel",
+    "tags": [
+      "Vehicle Models"
+    ],
+    "summary": "Finds vehicle models"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/vehicle-models/{id}",
+    "operationId": "deleteVehicleModelById",
+    "tags": [
+      "Vehicle Models"
+    ],
+    "summary": "Delete vehicle model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/vehicle-models/{id}",
+    "operationId": "getVehicleModelById",
+    "tags": [
+      "Vehicle Models"
+    ],
+    "summary": "Get vehicle model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/vehicle-models/{id}",
+    "operationId": "updateVehicleModel",
+    "tags": [
+      "Vehicle Models"
+    ],
+    "summary": "Update vehicle model"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicle/vid-block-list",
+    "operationId": "updateBlockedVidNumbers",
+    "tags": [
+      "VIDs"
+    ],
+    "summary": "Update blocked VID numbers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/vehicle/vid-block-list/filter",
+    "operationId": "filterBlockedVidNumbers",
+    "tags": [
+      "VIDs"
+    ],
+    "summary": "Filter blocked VID numbers"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicles",
+    "operationId": "addVehicle",
+    "tags": [
+      "Vehicles"
+    ],
+    "summary": "Add vehicle"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "POST",
+    "path": "/v1/vehicles/filter",
+    "operationId": "getVehiclesByFilter",
+    "tags": [
+      "Vehicles"
+    ],
+    "summary": "Find vehicles"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v1/vehicles/{id}",
+    "operationId": "deleteVehicleById",
+    "tags": [
+      "Vehicles"
+    ],
+    "summary": "Delete vehicle"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v1/vehicles/{id}",
+    "operationId": "getVehicleById",
+    "tags": [
+      "Vehicles"
+    ],
+    "summary": "Get vehicle"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v1/vehicles/{id}",
+    "operationId": "updateVehicle",
+    "tags": [
+      "Vehicles"
+    ],
+    "summary": "Update vehicle"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility",
+    "operationId": "getPlanEligibilityByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Get a customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility",
+    "operationId": "updatePlanEligibilityByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Update a customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/disable",
+    "operationId": "disablePlanEligibilityByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Disable customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/enable",
+    "operationId": "enablePlanEligibilityByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Enable customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/identifiers",
+    "operationId": "getIdentifiersByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility Identifiers"
+    ],
+    "summary": "Get eligibility identifiers by plan code and country-currency with pagination"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/identifiers",
+    "operationId": "addPlanEligibilityIdentifiersByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility Identifiers"
+    ],
+    "summary": "Add identifiers to a customer plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v2/customer-plans/{planCode}/country-currency/{countryCurrency}/locales/{locale}/eligibility/identifiers/{identifierId}",
+    "operationId": "deletePlanEligibilityIdentifierByCountryCurrency",
+    "tags": [
+      "Customer Plans Eligibility Identifiers"
+    ],
+    "summary": "Delete an identifier from plan eligibility by plan code and country-currency"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility",
+    "operationId": "getPlanEligibility",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Get a customer plan eligibility by plan code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility",
+    "operationId": "updatePlanEligibility",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Update a customer plan eligibility by plan code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility/disable",
+    "operationId": "disablePlanEligibility",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Disable customer plan eligibility"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility/enable",
+    "operationId": "enablePlanEligibility",
+    "tags": [
+      "Customer Plans Eligibility"
+    ],
+    "summary": "Enable customer plan eligibility"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "GET",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility/identifiers",
+    "operationId": "getIdentifiers",
+    "tags": [
+      "Customer Plans Eligibility Identifiers"
+    ],
+    "summary": "Get eligibility identifiers by plan code with pagination"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "PATCH",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility/identifiers",
+    "operationId": "addPlanEligibilityIdentifiers",
+    "tags": [
+      "Customer Plans Eligibility Identifiers"
+    ],
+    "summary": "Add identifiers to a customer plan eligibility by plan code"
+  },
+  {
+    "group": "Admin-Operators",
+    "method": "DELETE",
+    "path": "/v2/customer-plans/{planCode}/locales/{locale}/eligibility/identifiers/{identifierId}",
+    "operationId": "deletePlanEligibilityIdentifier",
+    "tags": [
+      "Customer Plans Eligibility Identifiers"
+    ],
+    "summary": "Delete an identifier from plan eligibility by plan code"
+  },
+  {
+    "group": "Customers",
+    "method": "PATCH",
+    "path": "/customers/v1/reservations/{id}/cancel",
+    "operationId": "cancelReservation",
+    "tags": [
+      "Reservations"
+    ],
+    "summary": "Cancel reservation by id"
+  }
+]

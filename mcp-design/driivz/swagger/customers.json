@@ -1,0 +1,524 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Api gateway",
+    "description": "Api gateway",
+    "version": ""
+  },
+  "servers": [
+    {
+      "url": "https://apex-migration.driivz.com:8103/api-gateway",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/customers/v1/reservations/{id}/cancel": {
+      "patch": {
+        "tags": [
+          "Reservations"
+        ],
+        "summary": "Cancel reservation by id",
+        "description": "Cancel reservation by its id",
+        "operationId": "cancelReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReservationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                },
+                "example": {
+                  "requestId": "yu4VpjJujO",
+                  "code": "api-gateway-403",
+                  "reason": "invalid.ticket",
+                  "message": "Invalid ticket",
+                  "httpStatusCode": 403
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                },
+                "example": {
+                  "requestId": "Xd5OhXwiau",
+                  "code": "api-gateway-404",
+                  "reason": "entity.not.found",
+                  "message": "Entity not found",
+                  "httpStatusCode": 404,
+                  "errors": [
+                    {
+                      "code": "api-gateway-404",
+                      "reason": "billing.transaction.not.found",
+                      "message": "Billing transaction not found"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                },
+                "example": {
+                  "requestId": "sel8WXUbyi",
+                  "code": "api-gateway-500",
+                  "reason": "internal.error",
+                  "message": "Unknown error",
+                  "httpStatusCode": 500,
+                  "errors": [
+                    {
+                      "code": "api-gateway-500",
+                      "reason": "internal.error",
+                      "message": "Unknown error"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "dmsTicket": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Message": {
+        "required": [
+          "code",
+          "message",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string",
+            "example": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string",
+            "example": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string",
+            "example": "string"
+          }
+        }
+      },
+      "ValidationResponse": {
+        "required": [
+          "errors",
+          "httpStatusCode",
+          "requestId"
+        ],
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "title": "Request id",
+            "type": "string",
+            "example": "1234567"
+          },
+          "messages": {
+            "title": "List of additional messages",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "httpStatusCode": {
+            "title": "Http status code",
+            "type": "integer",
+            "format": "int32",
+            "example": 400
+          },
+          "errors": {
+            "title": "List of errors",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          }
+        }
+      },
+      "Address": {
+        "title": "Address details",
+        "type": "object",
+        "properties": {
+          "address1": {
+            "title": "Address",
+            "type": "string",
+            "example": "Haharash 4"
+          },
+          "address2": {
+            "title": "Address2",
+            "type": "string",
+            "example": "Bldg D Mail Drop: D303"
+          },
+          "city": {
+            "title": "City",
+            "type": "string",
+            "example": "Hod Hasharon"
+          },
+          "zipCode": {
+            "title": "Zipcode",
+            "type": "string",
+            "example": "2134456"
+          },
+          "countryCode": {
+            "title": "Country code",
+            "type": "string",
+            "example": "ISR"
+          },
+          "stateCode": {
+            "title": "USA state code",
+            "type": "string",
+            "example": "NY"
+          },
+          "zoneId": {
+            "title": "Timezone id",
+            "type": "string",
+            "example": "America/New_York"
+          },
+          "market": {
+            "title": "Market",
+            "type": "string",
+            "example": "JACKSONVILLE - 525"
+          },
+          "municipality": {
+            "title": "Municipality",
+            "type": "string",
+            "example": "Worcester"
+          },
+          "region": {
+            "title": "Region",
+            "type": "string",
+            "example": "South Atlantic"
+          },
+          "houseNumber": {
+            "title": "House number",
+            "type": "string",
+            "example": "12A"
+          }
+        }
+      },
+      "ChargerReservation": {
+        "title": "Charger details",
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Charger ID",
+            "type": "integer",
+            "description": "The unique identifier of the charger",
+            "format": "int64",
+            "example": 452
+          },
+          "caption": {
+            "title": "Charger caption",
+            "type": "string",
+            "description": "A description of the charger",
+            "example": "Test charger"
+          },
+          "siteName": {
+            "title": "Site name",
+            "type": "string",
+            "description": "The site name",
+            "example": "NewSite"
+          },
+          "siteId": {
+            "title": "Site ID",
+            "type": "string",
+            "description": "The unique identifier of the site",
+            "example": "2324"
+          },
+          "property": {
+            "title": "Property name",
+            "type": "string",
+            "description": "The property name",
+            "example": "Property of LGM"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "connector": {
+            "$ref": "#/components/schemas/Connector"
+          }
+        }
+      },
+      "Connector": {
+        "title": "Connector details",
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Connector ID",
+            "type": "integer",
+            "format": "int64",
+            "example": 452
+          },
+          "name": {
+            "title": "Connector name",
+            "type": "string",
+            "example": "CHADEMO"
+          },
+          "placement": {
+            "title": "Placement",
+            "type": "string",
+            "description": "The placement of the connector on the charger. Options are:\n* NOT_SPECIFIED\n* LEFT\n* RIGHT\n* TOP\n* BOTTOM\n* CENTER\n* OTHER",
+            "example": "LEFT",
+            "enum": [
+              "NOT_SPECIFIED",
+              "LEFT",
+              "RIGHT",
+              "TOP",
+              "BOTTOM",
+              "CENTER",
+              "OTHER"
+            ]
+          },
+          "status": {
+            "title": "Connector status",
+            "type": "string",
+            "description": "The connector status. Options are:\n* AVAILABLE\n* CHARGING\n* FAULTED\n* UNAVAILABLE\n* NEW\n* UNKNOWN\n* RESERVED\n* DISCHARGING\n* PAUSED\n* PREPARING\n* FINISHING",
+            "example": "AVAILABLE",
+            "enum": [
+              "AVAILABLE",
+              "CHARGING",
+              "FAULTED",
+              "UNAVAILABLE",
+              "NEW",
+              "UNKNOWN",
+              "RESERVED",
+              "DISCHARGING",
+              "PAUSED",
+              "PREPARING",
+              "FINISHING"
+            ]
+          },
+          "type": {
+            "title": "Connector type",
+            "type": "string",
+            "description": "The connector type. Options are:\n* TYPE_2_MENNEKES\n* TYPE_4_CHADEMO\n* TYPE_F_SCHUKO_CEE_7_4_GER\n* TYPE_E_AND_F_CEE_7_5_FRA\n* TYPE_3_SCAME\n* TYPE_COMBO_GERMANY\n* TYPE_K_SECTION_107_2_D1_DEN\n* TYPE_C_CEE7_16_EU\n* TYPE_E_CEE_7_5_FRA\n* TYPE_C_CEE_7_17_GER_FRA\n* TYPE_L_CEI_23_16_VII_ITA\n* TYPE_J_SEV_1011_CH\n* TYPE_D_BS_546_2_PIN_UK\n* TYPE_D_BS_546_3_PIN_UK\n* TYPE_G_BS_1363_IS_401_AND_411_MS_58_UK\n* TYPE_1_J1772_YAZAKI\n* SAE_J1772_COMBO_US\n* SAE_J1772_AVCON\n* TESLA_UNIVERSAL_MOBILE_CONNECTOR\n* NEMA_1_15P\n* TYPE_B_NEMA_5_15\n* TYPE_B_NEMA_5_20\n* TESLA_R\n* TESLA_S\n* TYPE_2_TETHERED\n* NACS",
+            "example": "TYPE_2_MENNEKES"
+          }
+        }
+      },
+      "Reservation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Reservation ID",
+            "type": "integer",
+            "description": "The reservation ID",
+            "format": "int64",
+            "example": 134
+          },
+          "startDate": {
+            "title": "Start date",
+            "type": "integer",
+            "description": "The start date of the reservation, in epoch time",
+            "format": "int64",
+            "example": 1610534354
+          },
+          "endDate": {
+            "title": "End date",
+            "type": "integer",
+            "description": "The end date of the reservation, in epoch time",
+            "format": "int64",
+            "example": 1610534354
+          },
+          "createdOn": {
+            "title": "Date created",
+            "type": "integer",
+            "description": "The date the reservation was created, in epoch time",
+            "format": "int64",
+            "example": 1610534354
+          },
+          "status": {
+            "title": "Status",
+            "type": "string",
+            "description": "The reservation status. Options are:\n* ACTIVE\n* CANCELLED\n* EXPIRED\n* RESERVATION_DENIED\n* FULFILLED\n* FUTURE\n* PENDING_EXPIRATION",
+            "example": "ACTIVE",
+            "enum": [
+              "ACTIVE",
+              "CANCELLED",
+              "EXPIRED",
+              "RESERVATION_DENIED",
+              "FULFILLED",
+              "FUTURE",
+              "PENDING_EXPIRATION"
+            ]
+          },
+          "accountNumber": {
+            "title": "Account number",
+            "type": "integer",
+            "format": "int32"
+          },
+          "charger": {
+            "$ref": "#/components/schemas/ChargerReservation"
+          },
+          "terms": {
+            "$ref": "#/components/schemas/Terms"
+          },
+          "cardNumber": {
+            "title": "Card number",
+            "type": "string",
+            "description": "The card number",
+            "example": "966958AB"
+          }
+        }
+      },
+      "ReservationResponse": {
+        "required": [
+          "count",
+          "data",
+          "httpStatusCode",
+          "requestId"
+        ],
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "title": "Request id",
+            "type": "string",
+            "example": "1234567"
+          },
+          "messages": {
+            "title": "List of additional messages",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Message"
+            }
+          },
+          "httpStatusCode": {
+            "title": "Http status code",
+            "type": "integer",
+            "format": "int32",
+            "example": 200
+          },
+          "count": {
+            "title": "Number of entities returned",
+            "type": "integer",
+            "format": "int32",
+            "example": 1
+          },
+          "data": {
+            "title": "Entities data",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Reservation"
+            }
+          }
+        }
+      },
+      "Terms": {
+        "title": "Terms details",
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Terms ID",
+            "type": "integer",
+            "description": "The unique ID of the reservation terms",
+            "format": "int64",
+            "example": 13454
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string",
+            "description": "The currency. Options are:\n* USD\n* EUR\n* GBP\n* NIS\n* HUF\n* CZK\n* RON\n* HRK\n* SEK\n* NOK\n* SKK\n* CLP\n* COP\n* JPY\n* ISK\n* INR\n* NZD\n* DKK\n* CAD\n* AED\n* CHF\n* PLN\n* RUB\n* AUD\n* BGN\n* THB\n* MXN",
+            "example": "USD"
+          },
+          "reservationType": {
+            "title": "Reservation type",
+            "type": "string",
+            "description": "The reservation type. Options are NOW for an immediate reservation and FUTURE for a future reservation.",
+            "example": "NOW",
+            "enum": [
+              "NOW",
+              "FUTURE"
+            ]
+          },
+          "reservationFee": {
+            "title": "Reservation fee",
+            "type": "number",
+            "description": "The reservation fee in the relevant currency",
+            "example": 1.2
+          },
+          "cancellationFee": {
+            "title": "Cancellation fee",
+            "type": "number",
+            "description": "The cancellation fee in the relevant currency",
+            "example": 0.5
+          },
+          "noShowFee": {
+            "title": "No-show fee",
+            "type": "number",
+            "description": "The no-show fee in the relevant currency",
+            "example": 0.5
+          },
+          "duration": {
+            "title": "Reservation length",
+            "type": "number",
+            "description": "The amount of time that the charger is reserved for this driver",
+            "format": "float",
+            "example": 30
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "dmsTicket": {
+        "type": "apiKey",
+        "name": "dmsTicket",
+        "in": "header"
+      }
+    }
+  }
+}

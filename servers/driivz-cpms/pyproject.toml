@@ -1,0 +1,12 @@
+[project]
+name = "ubi-mcp-driivz-cpms"
+version = "0.1.0"
+description = "Driivz CPMS stdio MCP server for ubi-personal-assistant."
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.14.1",
+]
+
+[tool.uv]
+package = false

@@ -1,0 +1,16 @@
+[project]
+name = "ubi-mcp-datawarehouse"
+version = "0.1.0"
+description = "Databricks data warehouse core service for ubi-personal-assistant."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "databricks-sql-connector==4.2.6",
+    "pydantic-settings>=2.14.1",
+]
+
+[project.scripts]
+datawarehouse = "mcp_datawarehouse.cli:main"
+
+[tool.uv]
+package = false

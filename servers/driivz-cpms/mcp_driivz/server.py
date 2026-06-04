@@ -1,0 +1,1 @@
+"""Stdio MCP server entrypoint."""
