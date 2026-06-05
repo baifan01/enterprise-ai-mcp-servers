@@ -21,6 +21,7 @@ RECENT_SESSIONS_API = "POST /v1/ev-transactions/chargers/{identityKey}/filter"
 async def review_site_runtime_by_device(
     device_id: str,
     *,
+    user_id: str | None = None,
     include_recent_sessions: bool = True,
     settings: DriivzSettings | None = None,
 ) -> dict[str, Any]:
@@ -37,7 +38,7 @@ async def review_site_runtime_by_device(
         return _base_result(device_id=device_id, resolved=False, errors=[error])
 
     try:
-        async with DriivzClient(settings or DriivzSettings()) as client:
+        async with DriivzClient(settings or DriivzSettings(user_id=user_id)) as client:
             return await _review_with_client(
                 client,
                 normalized_device_id,

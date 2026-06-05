@@ -15,6 +15,7 @@ from typing import Any
 from mcp_datawarehouse.attempts import ChargingAttemptsQuery
 from mcp_datawarehouse.client import DatabricksClient
 from mcp_datawarehouse.errors import DatawarehouseServiceError
+from mcp_datawarehouse.online_status import DeviceOnlineStatusQuery
 from mcp_datawarehouse.ocpp import OCPPSequenceQuery
 from mcp_datawarehouse.settings import DatawarehouseSettings
 
@@ -27,12 +28,22 @@ async def query_charging_attempts(
     time_to: dt.datetime | str,
     sso_id: str | None = None,
     evse_id: str | None = None,
+    user_id: str | None = None,
     settings: DatawarehouseSettings | None = None,
 ) -> dict[str, Any]:
     """Return charging attempts and adjacent user-level merges for a device window."""
 
+    logger.info(
+        "Starting data warehouse service request: kind=attempts sso_id=%s evse_id=%s "
+        "time_from=%s time_to=%s has_user_id=%s",
+        sso_id,
+        evse_id,
+        time_from,
+        time_to,
+        bool(user_id),
+    )
     try:
-        async with DatabricksClient(settings or DatawarehouseSettings()) as client:
+        async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
             result = await ChargingAttemptsQuery(client).query(
                 sso_id=sso_id,
                 evse_id=evse_id,
@@ -59,6 +70,12 @@ async def query_charging_attempts(
         )
 
     result["errors"] = []
+    logger.info(
+        "Completed data warehouse service request: kind=attempts raw_attempt_count=%s "
+        "merged_attempt_count=%s",
+        result.get("raw_attempt_count"),
+        result.get("merged_attempt_count"),
+    )
     return result
 
 
@@ -67,6 +84,7 @@ async def query_ocpp_sequence(
     sso_id: str,
     time_from: dt.datetime | str,
     time_to: dt.datetime | str,
+    user_id: str | None = None,
     include_heartbeats: bool = False,
     include_raw_payload: bool = False,
     max_payload_chars: int = 1200,
@@ -74,8 +92,18 @@ async def query_ocpp_sequence(
 ) -> dict[str, Any]:
     """Return a compact OCPP event sequence for a device window."""
 
+    logger.info(
+        "Starting data warehouse service request: kind=ocpp sso_id=%s time_from=%s "
+        "time_to=%s include_heartbeats=%s include_raw_payload=%s has_user_id=%s",
+        sso_id,
+        time_from,
+        time_to,
+        include_heartbeats,
+        include_raw_payload,
+        bool(user_id),
+    )
     try:
-        async with DatabricksClient(settings or DatawarehouseSettings()) as client:
+        async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
             result = await OCPPSequenceQuery(client).query(
                 sso_id=sso_id,
                 time_from=time_from,
@@ -118,6 +146,76 @@ async def query_ocpp_sequence(
         )
 
     result["errors"] = []
+    logger.info(
+        "Completed data warehouse service request: kind=ocpp event_count=%s",
+        result.get("event_count"),
+    )
+    return result
+
+
+async def query_device_online_status(
+    *,
+    sso_id: str,
+    time_from: dt.datetime | str,
+    time_to: dt.datetime | str,
+    user_id: str | None = None,
+    heartbeat_interval_seconds: int = 900,
+    missed_heartbeat_tolerance: int = 1,
+    recent_end_grace_seconds: int = 1800,
+    settings: DatawarehouseSettings | None = None,
+) -> dict[str, Any]:
+    """Return legacy-compatible Heartbeat gap offline periods for a device window."""
+
+    logger.info(
+        "Starting data warehouse service request: kind=online_status sso_id=%s "
+        "time_from=%s time_to=%s heartbeat_interval_seconds=%s "
+        "missed_heartbeat_tolerance=%s recent_end_grace_seconds=%s has_user_id=%s",
+        sso_id,
+        time_from,
+        time_to,
+        heartbeat_interval_seconds,
+        missed_heartbeat_tolerance,
+        recent_end_grace_seconds,
+        bool(user_id),
+    )
+    query = {
+        "sso_id": sso_id,
+        "time_from": time_from,
+        "time_to": time_to,
+        "heartbeat_interval_seconds": heartbeat_interval_seconds,
+        "missed_heartbeat_tolerance": missed_heartbeat_tolerance,
+        "recent_end_grace_seconds": recent_end_grace_seconds,
+    }
+    try:
+        async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
+            result = await DeviceOnlineStatusQuery(client).query(
+                sso_id=sso_id,
+                time_from=time_from,
+                time_to=time_to,
+                heartbeat_interval_seconds=heartbeat_interval_seconds,
+                missed_heartbeat_tolerance=missed_heartbeat_tolerance,
+                recent_end_grace_seconds=recent_end_grace_seconds,
+            )
+    except DatawarehouseServiceError as exc:
+        return _failed_result(query=query, errors=[exc], kind="online_status")
+    except ValueError as exc:
+        error = DatawarehouseServiceError(
+            type="invalid_request",
+            message=str(exc),
+            segment="input",
+            retryable=False,
+        )
+        return _failed_result(query=query, errors=[error], kind="online_status")
+
+    result["errors"] = []
+    logger.info(
+        "Completed data warehouse service request: kind=online_status has_offline=%s "
+        "offline_period_count=%s event_count_in_window=%s heartbeat_count_in_window=%s",
+        result.get("has_offline"),
+        result.get("summary", {}).get("offline_period_count"),
+        result.get("event_count_in_window"),
+        result.get("heartbeat_count_in_window"),
+    )
     return result
 
 
@@ -146,6 +244,23 @@ def _failed_result(
             "merged_attempt_count": 0,
             "raw_attempts": [],
             "merged_attempts": [],
+            "errors": [error.to_dict() for error in errors],
+        }
+    if kind == "online_status":
+        return {
+            "query": normalized_query,
+            "has_offline": False,
+            "offline_periods": [],
+            "latest_event_before_or_at_end": None,
+            "previous_event_before_window": None,
+            "next_event_after_window": None,
+            "event_count_in_window": 0,
+            "heartbeat_count_in_window": 0,
+            "summary": {
+                "offline_period_count": 0,
+                "total_offline_seconds": 0,
+                "total_offline_minutes": 0.0,
+            },
             "errors": [error.to_dict() for error in errors],
         }
     return {

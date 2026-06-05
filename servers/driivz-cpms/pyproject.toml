@@ -6,7 +6,11 @@ requires-python = ">=3.12"
 dependencies = [
     "httpx>=0.28.1",
     "pydantic-settings>=2.14.1",
+    "ubi-mcp-common",
 ]
+
+[tool.uv.sources]
+ubi-mcp-common = { path = "../common" }
 
 [tool.uv]
 package = false

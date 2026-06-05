@@ -50,7 +50,9 @@ class DatabricksClient:
         parameter_list = list(parameters) if parameters is not None else None
         parameter_count = len(parameter_list) if parameter_list is not None else 0
         logger.info(
-            "Starting Databricks query",
+            "Starting Databricks query: source_query=%s parameter_count=%s",
+            source_query,
+            parameter_count,
             extra={"source_query": source_query, "parameter_count": parameter_count},
         )
         try:
@@ -76,7 +78,9 @@ class DatabricksClient:
             ) from exc
 
         logger.info(
-            "Databricks query completed",
+            "Databricks query completed: source_query=%s row_count=%s",
+            source_query,
+            len(result.rows),
             extra={"source_query": source_query, "row_count": len(result.rows)},
         )
         return result

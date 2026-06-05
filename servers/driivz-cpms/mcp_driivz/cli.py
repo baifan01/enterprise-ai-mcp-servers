@@ -15,10 +15,11 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     review = subparsers.add_parser(
-        "review-site-runtime",
+        "review-site-runtime-by-device",
         help="Review site/runtime context by company device ID.",
     )
     review.add_argument("device_id", help="Company device ID / Driivz identityKey.")
+    review.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
     review.add_argument(
         "--no-recent-sessions",
         action="store_true",
@@ -29,9 +30,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 async def run(args: argparse.Namespace) -> dict[str, Any]:
-    if args.command == "review-site-runtime":
+    if args.command == "review-site-runtime-by-device":
         return await review_site_runtime_by_device(
             args.device_id,
+            user_id=args.user_id,
             include_recent_sessions=not args.no_recent_sessions,
         )
     raise ValueError(f"Unsupported command: {args.command}")

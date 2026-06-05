@@ -12,8 +12,9 @@ import os
 from pathlib import Path
 from typing import Any
 
-from pydantic import AliasChoices, Field, SecretStr
+from pydantic import AliasChoices, Field, PrivateAttr, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from ubi_mcp_common import PersonalSecretsError, load_personal_secret_values
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_ENV_FILE = PROJECT_DIR / ".env"
@@ -37,12 +38,20 @@ class DatawarehouseSettings(BaseSettings):
         populate_by_name=True,
     )
 
+    _credential_source_error: str | None = PrivateAttr(default=None)
+
     def __init__(self, **values: Any) -> None:
+        user_id = values.pop("user_id", None)
         env_file = os.environ.get("DATAWAREHOUSE_ENV_FILE")
         if env_file:
             values.setdefault("_env_file", env_file)
         super().__init__(**values)
+        self._load_personal_credentials(user_id)
 
+    agent_root: Path | None = Field(
+        default=None,
+        validation_alias=AliasChoices("UBI_AI_AGENT_ROOT", "agent_root"),
+    )
     databricks_server_hostname: str | None = Field(
         default=None,
         validation_alias=AliasChoices(
@@ -118,11 +127,14 @@ class DatawarehouseSettings(BaseSettings):
     def validate_databricks_auth(self) -> None:
         if self.databricks_server_hostname and self.databricks_http_path and self.databricks_token:
             return
-        raise ValueError(
+        message = (
             "Missing Databricks credentials. Set DATABRICKS_SERVER_HOSTNAME, "
-            "DATABRICKS_HTTP_PATH, and DATABRICKS_TOKEN in the environment or "
-            "in DATAWAREHOUSE_ENV_FILE."
+            "DATABRICKS_HTTP_PATH, and DATABRICKS_TOKEN in the runtime environment "
+            "or in the user's personal secrets file."
         )
+        if self._credential_source_error:
+            message = f"{message} Personal secrets lookup failed: {self._credential_source_error}"
+        raise ValueError(message)
 
     def table(self, name: str) -> str:
         return ".".join(
@@ -132,3 +144,36 @@ class DatawarehouseSettings(BaseSettings):
                 quote_identifier(name),
             ]
         )
+
+    def _load_personal_credentials(self, user_id: str | None) -> None:
+        if (
+            self.databricks_server_hostname
+            and self.databricks_http_path
+            and self.databricks_token
+        ):
+            return
+        if not user_id:
+            return
+        if self.agent_root is None:
+            self._credential_source_error = "UBI_AI_AGENT_ROOT is not configured."
+            return
+        try:
+            values = load_personal_secret_values(
+                agent_root=self.agent_root,
+                user_id=user_id,
+                required_keys=[
+                    "DATABRICKS_SERVER_HOSTNAME",
+                    "DATABRICKS_HTTP_PATH",
+                    "DATABRICKS_TOKEN",
+                ],
+            )
+        except PersonalSecretsError as exc:
+            self._credential_source_error = str(exc)
+            return
+
+        if not self.databricks_server_hostname:
+            self.databricks_server_hostname = values["DATABRICKS_SERVER_HOSTNAME"]
+        if not self.databricks_http_path:
+            self.databricks_http_path = values["DATABRICKS_HTTP_PATH"]
+        if not self.databricks_token:
+            self.databricks_token = SecretStr(values["DATABRICKS_TOKEN"])

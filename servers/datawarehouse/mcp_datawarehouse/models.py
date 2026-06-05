@@ -80,3 +80,15 @@ class OCPPEvent:
     ocpp_request_body: str | None = None
     ocpp_response_body: str | None = None
     raw: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class OfflinePeriod:
+    """Legacy-compatible Heartbeat gap that overlaps the requested window."""
+
+    sso_id: str
+    offline_start: dt.datetime
+    offline_restore: dt.datetime
+    duration_seconds: int
+    reason: str
+    evidence: dict[str, Any] = field(default_factory=dict)
