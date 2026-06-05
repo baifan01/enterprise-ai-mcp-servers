@@ -36,9 +36,10 @@ ubi-personal-assistant-data/
       workspace/
       readonly/
         local-tools/
-          README.md
           review-site-runtime-by-device.sh
           review-site-runtime-by-device.readme.md
+          query-ocpp-sequence.sh
+          query-ocpp-sequence.readme.md
       secrets/
         personal-secrets.env
 ```
@@ -73,7 +74,8 @@ ubi-personal-assistant-mcp-servers/
 ```text
 Agent
   -> 看到 users/<user_id>/readonly/local-tools/
-  -> 读取 README.md 和同名 .readme.md
+  -> 根据可见 .sh 判断该用户有哪些 local tools 可用
+  -> 读取目标 wrapper 的同名 .readme.md
   -> 调用某个 wrapper.sh
   -> wrapper.sh 使用对应工具目录自己的 .venv/bin/python 调用真实 Python CLI
   -> Python tool 接收 --user-id
@@ -110,6 +112,45 @@ readonly/local-tools/review-site-runtime-by-device.sh suby1100008277
 ```
 
 Agent 不需要知道 secret 文件在哪里，也不需要知道真实 Python package 的内部结构。Agent 需要先读取同名说明文件，例如 `review-site-runtime-by-device.readme.md`，了解参数、限制和使用场景。
+
+## Wrapper 和说明文件生成规则
+
+`readonly/local-tools/` 下不放综合 README。原因是未来 wrapper 由平台按用户权限自动生成，工具可见性应由文件对本身表达，避免综合 README 与实际 wrapper 列表发生漂移。
+
+每个可调用工具由一对同名文件组成：
+
+```text
+<tool-name>.sh
+<tool-name>.readme.md
+```
+
+例如：
+
+```text
+review-site-runtime-by-device.sh
+review-site-runtime-by-device.readme.md
+
+query-ocpp-sequence.sh
+query-ocpp-sequence.readme.md
+```
+
+生成要求：
+
+- `.sh` 是唯一可执行入口，文件存在表示该用户可以调用该 local tool。
+- `.readme.md` 是该 wrapper 的详细说明，必须与 `.sh` 同名。
+- `.readme.md` 至少包含用途、适用问题、命令格式、参数说明、时间范围限制、示例、输出重点和使用注意事项。
+- `.sh` 内固定写入当前 `user_id`，调用方不传 `--user-id`。
+- `.sh` 使用对应工具代码目录自己的 `.venv/bin/python`，不使用统一 runtime venv，也不依赖 `uv run`。
+- `.sh` 不写入 token、password、secret 文件路径或其他敏感值。
+
+AgentRuntime 的提示词应告诉 agent：
+
+```text
+User-approved local tools may exist under readonly/local-tools/.
+Each callable tool is a .sh file.
+Before using a tool, read its same-name .readme.md file for purpose, parameters, limits, and examples.
+Do not pass --user-id; wrappers already bind the current user.
+```
 
 ## Secret 约定
 
