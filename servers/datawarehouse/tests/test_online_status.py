@@ -38,16 +38,15 @@ def ocpp_result(rows: list[tuple[str, dt.datetime, str]]) -> QueryResult:
 
 
 class DeviceOnlineStatusQueryTest(unittest.IsolatedAsyncioTestCase):
-    async def test_queries_window_edges_and_detects_clipped_offline_period(self) -> None:
+    async def test_queries_only_window_and_detects_observed_offline_period(self) -> None:
         client = FakeClient(
             [
                 ocpp_result(
-                    [("suby1100012048", dt.datetime(2025, 12, 1, 14, 20, 0), "Heartbeat")]
+                    [
+                        ("suby1100012048", dt.datetime(2026, 1, 2, 7, 0, 0), "Heartbeat"),
+                        ("suby1100012048", dt.datetime(2026, 1, 2, 8, 0, 0), "Heartbeat"),
+                    ]
                 ),
-                ocpp_result(
-                    [("suby1100012048", dt.datetime(2026, 1, 5, 0, 0, 0), "Heartbeat")]
-                ),
-                ocpp_result([]),
             ]
         )
 
@@ -58,37 +57,34 @@ class DeviceOnlineStatusQueryTest(unittest.IsolatedAsyncioTestCase):
             now=dt.datetime(2026, 1, 11, 0, 0, 0),
         )
 
-        self.assertEqual(len(client.calls), 3)
+        self.assertEqual(len(client.calls), 1)
         for query, _parameters, _source_query in client.calls:
             self.assertIn("WHERE sso_id = ?", query)
             self.assertNotIn("REGEXP_EXTRACT", query)
-        previous_query, previous_parameters, _previous_source = client.calls[0]
-        next_query, next_parameters, _next_source = client.calls[2]
-        self.assertIn("AND operation_timestamp >= ?", previous_query)
-        self.assertEqual(previous_parameters[1], dt.datetime(2025, 12, 31, 0, 0, 0))
-        self.assertIn("AND operation_timestamp <= ?", next_query)
-        self.assertEqual(next_parameters[2], dt.datetime(2026, 1, 11, 0, 0, 0))
+        _window_query, window_parameters, _window_source = client.calls[0]
+        self.assertEqual(window_parameters[1], dt.datetime(2026, 1, 1, 0, 0, 0))
+        self.assertEqual(window_parameters[2], dt.datetime(2026, 1, 10, 0, 0, 0))
         self.assertEqual(
             [source_query for _query, _parameters, source_query in client.calls],
-            [
-                "charger_ocpp_operations_v.online_status.previous_event",
-                "charger_ocpp_operations_v.online_status.window_events",
-                "charger_ocpp_operations_v.online_status.next_event",
-            ],
+            ["charger_ocpp_operations_v.online_status.window_events"],
         )
-        self.assertTrue(result["query"]["queried_next_event_after_window"])
+        self.assertNotIn("boundary_policy", result["query"])
+        self.assertNotIn("queried_previous_event_before_window", result["query"])
+        self.assertNotIn("queried_next_event_after_window", result["query"])
         self.assertTrue(result["has_offline"])
-        self.assertEqual(result["offline_periods"][0]["offline_start"], "2026-01-01T00:00:00")
-        self.assertEqual(result["offline_periods"][0]["offline_restore"], "2026-01-05T00:00:00")
-        self.assertEqual(result["event_count_in_window"], 1)
-        self.assertEqual(result["heartbeat_count_in_window"], 1)
+        self.assertEqual(result["offline_periods"][0]["offline_start"], "2026-01-02T07:00:00")
+        self.assertEqual(result["offline_periods"][0]["offline_restore"], "2026-01-02T08:00:00")
+        self.assertEqual(result["coverage"]["observed_time_from"], "2026-01-02T07:00:00")
+        self.assertEqual(result["coverage"]["observed_time_to"], "2026-01-02T08:00:00")
+        self.assertNotIn("latest_event_before_or_at_end", result)
+        self.assertNotIn("previous_event_before_window", result)
+        self.assertNotIn("next_event_after_window", result)
+        self.assertEqual(result["event_count_in_window"], 2)
+        self.assertEqual(result["heartbeat_count_in_window"], 2)
 
-    async def test_skips_next_event_when_end_is_near_now(self) -> None:
+    async def test_empty_window_reports_no_observed_coverage(self) -> None:
         client = FakeClient(
             [
-                ocpp_result(
-                    [("suby1100012048", dt.datetime(2026, 1, 1, 10, 0, 0), "Heartbeat")]
-                ),
                 ocpp_result([]),
             ]
         )
@@ -101,9 +97,35 @@ class DeviceOnlineStatusQueryTest(unittest.IsolatedAsyncioTestCase):
             now=dt.datetime(2026, 1, 1, 10, 30, 0),
         )
 
-        self.assertEqual(len(client.calls), 2)
-        self.assertFalse(result["query"]["queried_next_event_after_window"])
-        self.assertIsNone(result["next_event_after_window"])
+        self.assertEqual(len(client.calls), 1)
+        self.assertEqual(result["coverage"]["requested_time_from"], "2026-01-01T10:00:00")
+        self.assertEqual(result["coverage"]["requested_time_to"], "2026-01-01T10:25:00")
+        self.assertIsNone(result["coverage"]["observed_time_from"])
+        self.assertIsNone(result["coverage"]["observed_time_to"])
+        self.assertIsNone(result["coverage"]["first_event_in_window"])
+        self.assertIsNone(result["coverage"]["last_event_in_window"])
+        self.assertNotIn("queried_next_event_after_window", result["query"])
+        self.assertFalse(result["has_offline"])
+
+    async def test_online_status_window_is_limited_to_31_days(self) -> None:
+        start = dt.datetime(2026, 1, 1, 0, 0, 0)
+        client = FakeClient([ocpp_result([])])
+
+        result = await DeviceOnlineStatusQuery(client).query(
+            sso_id="suby1100012048",
+            time_from=start,
+            time_to=start + dt.timedelta(days=31),
+        )
+
+        self.assertFalse(result["has_offline"])
+        self.assertEqual(len(client.calls), 1)
+
+        with self.assertRaisesRegex(ValueError, "online status query is limited to 31 days"):
+            await DeviceOnlineStatusQuery(client).query(
+                sso_id="suby1100012048",
+                time_from=start,
+                time_to=start + dt.timedelta(days=31, seconds=1),
+            )
 
 
 if __name__ == "__main__":

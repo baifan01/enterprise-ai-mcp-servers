@@ -5,7 +5,7 @@
 旧项目中已有一段基于 OCPP Heartbeat 的充电桩掉线分析逻辑，目前作为调研参考代码保留在：
 
 ```text
-mcp-design/datawarehouse/databricks-investigation/src/databricks_investigation/cp_heartbeat_analysis_db.py
+design/datawarehouse/databricks-investigation/src/databricks_investigation/cp_heartbeat_analysis_db.py
 ```
 
 该脚本的核心类是 `ChargerHeartbeatAnalyzerDB`，核心方法是 `update_device_state()`。它按设备扫描 OCPP 事件流，使用以下规则判断疑似掉线：
@@ -36,8 +36,7 @@ analysis_end
 设备在该时间窗口内是否发生疑似掉线
 疑似掉线区间列表
 每个掉线区间的开始时间、恢复时间、持续时间
-窗口内最后一次可见 OCPP 事件
-截止 analysis_end 的最近 OCPP 事件
+requested range 内第一条和最后一条可见 OCPP 事件
 用于解释判断结果的 evidence
 ```
 
@@ -189,103 +188,67 @@ offline_restore = 10:50
 analysis_start -> analysis_end
 ```
 
-实际分析时需要额外处理窗口前和窗口后的事件，否则无法判断跨窗口掉线。
+当前生产工具优先保证响应时间，只查询用户输入窗口内的 OCPP event，不再额外查询窗口前或窗口后的事件。
 
-### 5.1 窗口前最近事件
+为避免长窗口打爆 Databricks 查询和 tool response，当前在线状态查询最大时间窗口为 31 天。超过该范围的请求直接返回 invalid request，不执行 SQL。
 
-必须查询 `analysis_start` 之前最近的一条 OCPP event。
-
-目的：
+因此返回结果必须同时说明：
 
 ```text
-判断窗口开始时设备是否已经处于一个 Heartbeat gap 中；
-识别从窗口开始前持续到窗口内的疑似掉线。
+requested_time_from / requested_time_to:
+用户请求的时间范围
+
+observed_time_from / observed_time_to:
+本次 SQL 在 requested range 内实际查到的第一条和最后一条 OCPP event 时间
 ```
 
-示例：
+如果 `requested_time_from` 是 `2026-01-01 08:00:00`，但第一条可见事件是 `2026-01-02 07:00:00`，工具不推断 `2026-01-01 08:00:00 -> 2026-01-02 07:00:00` 之间是否掉线，只在 coverage metadata 中说明第一条可见事件时间。
+
+同理，如果 `requested_time_to` 是 `2026-01-10 20:00:00`，但最后一条可见事件是 `2026-01-07 10:00:00`，工具不推断 `2026-01-07 10:00:00 -> 2026-01-10 20:00:00` 之间是否掉线，只在 coverage metadata 中说明最后一条可见事件时间。
+
+### 5.1 窗口内实际事件
+
+只执行一条 SQL：
 
 ```text
-analysis_start: 2026-01-01 00:00:00
-previous event before start: 2025-12-01 14:20:00 Heartbeat
-first event in window: 2026-01-05 00:00:00 Heartbeat
+WHERE sso_id = ?
+  AND operation_timestamp >= ?
+  AND operation_timestamp <= ?
+ORDER BY operation_timestamp ASC
 ```
 
-如果中间没有其他 OCPP event，且 gap 超过阈值，则返回一条跨窗口疑似掉线：
+分析逻辑只基于这条 SQL 返回的事件流：
 
 ```text
-raw offline period:
-2025-12-01 14:20:00 -> 2026-01-05 00:00:00
-
-clipped to requested window:
-2026-01-01 00:00:00 -> 2026-01-05 00:00:00
+analysis_start = first_event_in_window.operation_timestamp
+analysis_end = last_event_in_window.operation_timestamp
 ```
 
-evidence 中保留真实上一条事件：
+如果窗口内没有任何事件：
 
 ```text
-previous_heartbeat_time = 2025-12-01 14:20:00
-restore_heartbeat_time = 2026-01-05 00:00:00
+has_offline = false
+offline_periods = []
+observed_time_from = null
+observed_time_to = null
 ```
 
-### 5.2 窗口后最近事件
+### 5.2 不再查询窗口前后事件
 
-如果 `analysis_end` 距离当前时间足够远，需要查询 `analysis_end` 之后最近的一条 OCPP event。
-
-目的：
+早期设计曾计划额外查询：
 
 ```text
-判断窗口结束后是否出现恢复 Heartbeat；
-识别跨过 analysis_end 的疑似掉线；
-为 offline_restore 提供 evidence。
+analysis_start 之前最近一条 OCPP event
+analysis_end 之后最近一条 OCPP event
 ```
 
-但如果 `analysis_end` 接近当前时间，不需要往后查询，因为未来数据本来还没有产生。
+这会让一次在线状态分析变成多条 Databricks SQL，实际运行时响应时间和稳定性不可接受。当前实现不做这两个 edge lookup，也不返回跨 requested range 边界的掉线推断。
 
-建议规则：
+返回结果不再保留窗口前后事件占位字段。调用方应读取 `coverage.first_event_in_window` 和 `coverage.last_event_in_window` 来理解本次分析实际覆盖到的事件边界。
 
-```text
-now - analysis_end <= recent_end_grace_seconds:
-    不查询窗口后事件
+### 5.3 输出区间范围
 
-now - analysis_end > recent_end_grace_seconds:
-    查询 analysis_end 后最近一条 OCPP event
-```
-
-默认：
-
-```text
-recent_end_grace_seconds = 1800
-```
-
-也就是：如果结束时间距离当前时刻不到约 30 分钟，视为近实时查询，不额外找窗口后的恢复事件。
-
-### 5.3 输出区间裁剪
-
-内部可以使用窗口前/窗口后的事件判断 raw offline period，但最终面向用户的 `offline_start` / `offline_restore` 需要裁剪到用户输入窗口。
-
-示例：
-
-```text
-analysis_start: 10:00
-analysis_end: 11:00
-raw offline period: 09:45 -> 10:50
-output period: 10:00 -> 10:50
-```
-
-如果 raw offline period 跨过窗口结束：
-
-```text
-analysis_start: 10:00
-analysis_end: 11:00
-raw offline period: 10:30 -> 12:00
-output period: 10:30 -> 11:00
-```
-
-evidence 中仍保留真实恢复时间：
-
-```text
-raw_restore_time = 12:00
-```
+由于当前只分析窗口内实际查到的事件，`offline_start` 和 `offline_restore` 都来自 range 内事件流，不输出跨 requested range 边界裁剪后的掉线区间。
 
 ## 6. Databricks 查询设计
 
@@ -293,45 +256,17 @@ raw_restore_time = 12:00
 
 ```sql
 SELECT
-    REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) AS sso_id,
+    sso_id,
     operation_timestamp,
     ocpp_message_type
 FROM `emobility-uc-prd`.`curated-emob-ubitricity-core`.charger_ocpp_operations_v
-WHERE REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) = ?
+WHERE sso_id = ?
   AND operation_timestamp >= ?
   AND operation_timestamp <= ?
 ORDER BY operation_timestamp ASC
 ```
 
-### 6.2 窗口前最近 OCPP event
-
-```sql
-SELECT
-    REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) AS sso_id,
-    operation_timestamp,
-    ocpp_message_type
-FROM `emobility-uc-prd`.`curated-emob-ubitricity-core`.charger_ocpp_operations_v
-WHERE REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) = ?
-  AND operation_timestamp < ?
-ORDER BY operation_timestamp DESC
-LIMIT 1
-```
-
-### 6.3 窗口后最近 OCPP event
-
-仅当 `analysis_end` 距离当前时间超过 `recent_end_grace_seconds` 时执行：
-
-```sql
-SELECT
-    REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) AS sso_id,
-    operation_timestamp,
-    ocpp_message_type
-FROM `emobility-uc-prd`.`curated-emob-ubitricity-core`.charger_ocpp_operations_v
-WHERE REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) = ?
-  AND operation_timestamp > ?
-ORDER BY operation_timestamp ASC
-LIMIT 1
-```
+当前不再执行窗口前或窗口后的 edge lookup SQL。
 
 ## 7. 建议数据结构
 
@@ -358,6 +293,7 @@ analysis_start <= analysis_end
 heartbeat_interval_seconds > 0
 missed_heartbeat_tolerance >= 1
 recent_end_grace_seconds >= 0
+analysis_end - analysis_start <= 31 天
 ```
 
 ### 7.2 OCPP 事件对象
@@ -391,11 +327,9 @@ class DeviceHeartbeatAnalysisResult:
     device_id: str
     analysis_start: datetime
     analysis_end: datetime
+    coverage: dict
     has_offline: bool
     offline_periods: list[OfflinePeriod]
-    latest_event_before_or_at_end: Optional[ConnectivityEvent]
-    previous_event_before_window: Optional[ConnectivityEvent]
-    next_event_after_window: Optional[ConnectivityEvent]
     event_count_in_window: int
     heartbeat_count_in_window: int
     summary: dict
@@ -403,14 +337,14 @@ class DeviceHeartbeatAnalysisResult:
 
 ## 8. 推荐模块拆分
 
-当前仍在调研目录内验证，不进入生产代码。
+当前实现已经进入 `servers/datawarehouse`，调研目录仅作为历史参考。
 
 ### 8.1 核心纯逻辑模块
 
 路径：
 
 ```text
-mcp-design/datawarehouse/databricks-investigation/src/databricks_investigation/heartbeat_gap_analyzer.py
+servers/datawarehouse/mcp_datawarehouse/heartbeat_gap.py
 ```
 
 职责：
@@ -427,16 +361,14 @@ mcp-design/datawarehouse/databricks-investigation/src/databricks_investigation/h
 路径：
 
 ```text
-mcp-design/datawarehouse/databricks-investigation/src/databricks_investigation/online_status.py
+servers/datawarehouse/mcp_datawarehouse/online_status.py
 ```
 
 说明：
 
 ```text
 当前已有 DeviceOnlineStatusQuery。
-可以在该类中替换现有轻量 Heartbeat-only 实现，
-让它查询窗口内事件、窗口前事件、必要时窗口后事件，
-然后调用 heartbeat_gap_analyzer.py。
+该类只查询窗口内事件，然后调用 heartbeat_gap_analyzer.py。
 ```
 
 ## 9. 核心算法草案
@@ -479,12 +411,10 @@ def analyze_heartbeat_gaps(events, analysis_start, analysis_end, threshold):
     return offline_periods
 ```
 
-参与分析的 `events` 应包含：
+参与分析的 `events` 只包含：
 
 ```text
-previous_event_before_window，若存在
 window_events
-next_event_after_window，若需要查询且存在
 ```
 
 ## 10. 输出示例
@@ -494,37 +424,42 @@ next_event_after_window，若需要查询且存在
   "device_id": "suby1100012048",
   "analysis_start": "2026-01-01T00:00:00Z",
   "analysis_end": "2026-01-10T00:00:00Z",
+  "coverage": {
+    "requested_time_from": "2026-01-01T00:00:00Z",
+    "requested_time_to": "2026-01-10T00:00:00Z",
+    "observed_time_from": "2026-01-02T07:00:00Z",
+    "observed_time_to": "2026-01-09T23:45:00Z",
+    "first_event_in_window": {
+      "event_time": "2026-01-02T07:00:00Z",
+      "event_type": "Heartbeat"
+    },
+    "last_event_in_window": {
+      "event_time": "2026-01-09T23:45:00Z",
+      "event_type": "Heartbeat"
+    }
+  },
   "has_offline": true,
   "offline_periods": [
     {
-      "offline_start": "2026-01-01T00:00:00Z",
-      "offline_restore": "2026-01-05T00:00:00Z",
-      "duration_seconds": 345600,
+      "offline_start": "2026-01-02T07:00:00Z",
+      "offline_restore": "2026-01-02T08:00:00Z",
+      "duration_seconds": 3600,
       "evidence": {
-        "raw_offline_start": "2025-12-01T14:20:00Z",
-        "raw_offline_restore": "2026-01-05T00:00:00Z",
-        "previous_heartbeat_time": "2025-12-01T14:20:00Z",
-        "restore_heartbeat_time": "2026-01-05T00:00:00Z",
+        "raw_offline_start": "2026-01-02T07:00:00Z",
+        "raw_offline_restore": "2026-01-02T08:00:00Z",
+        "previous_heartbeat_time": "2026-01-02T07:00:00Z",
+        "restore_heartbeat_time": "2026-01-02T08:00:00Z",
         "threshold_seconds": 1800,
-        "clipped_to_requested_window": true
+        "clipped_to_requested_window": false
       }
     }
   ],
-  "latest_event_before_or_at_end": {
-    "event_time": "2026-01-09T23:45:00Z",
-    "event_type": "Heartbeat"
-  },
-  "previous_event_before_window": {
-    "event_time": "2025-12-01T14:20:00Z",
-    "event_type": "Heartbeat"
-  },
-  "next_event_after_window": null,
   "event_count_in_window": 864,
   "heartbeat_count_in_window": 860,
   "summary": {
     "offline_period_count": 1,
-    "total_offline_seconds": 345600,
-    "total_offline_minutes": 5760.0
+    "total_offline_seconds": 3600,
+    "total_offline_minutes": 60.0
   }
 }
 ```
@@ -541,11 +476,9 @@ analysis_start 晚于 analysis_end 时报错
 正常每 15 分钟 Heartbeat，不输出掉线
 两个 Heartbeat 间隔超过阈值，且中间没有其他 OCPP event，输出掉线
 两个 Heartbeat 间隔超过阈值，但中间有非 Heartbeat OCPP event，不输出掉线
-窗口开始前上一条 Heartbeat 与窗口内第一条 Heartbeat 构成跨窗口掉线
-窗口结束后下一条 Heartbeat 与窗口内最后一条 Heartbeat 构成跨窗口掉线
-analysis_end 接近当前时间时，不查询窗口后事件
-完全没有窗口前事件时，只基于窗口内事件判断
-窗口内没有任何事件，但窗口前后 Heartbeat 构成 gap 时，输出裁剪后的掉线
+第一条窗口内事件晚于 requested start 时，coverage 说明 observed start
+最后一条窗口内事件早于 requested end 时，coverage 说明 observed end
+窗口内没有任何事件时，coverage observed 字段为 null 且不输出掉线
 ```
 
 ## 12. 关键设计结论
@@ -557,7 +490,8 @@ analysis_end 接近当前时间时，不查询窗口后事件
 如果两个 Heartbeat 之间出现任何其他 OCPP event，则不判掉线；
 不接入 charging attempt；
 不输出完整状态时间线；
-通过窗口前后一条事件补足边界判断。
+只查询 requested range 内事件；
+通过 coverage 字段说明 range 内第一条和最后一条可见事件。
 ```
 
 这样可以快速得到一个可用的临时分析工具。等 BI team 的正式结果或更稳定数据源可用后，再用正式口径替换当前逻辑。

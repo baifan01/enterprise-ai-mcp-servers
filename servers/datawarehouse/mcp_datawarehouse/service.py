@@ -249,11 +249,21 @@ def _failed_result(
     if kind == "online_status":
         return {
             "query": normalized_query,
+            "coverage": {
+                "requested_time_from": normalized_query.get("time_from"),
+                "requested_time_to": normalized_query.get("time_to"),
+                "observed_time_from": None,
+                "observed_time_to": None,
+                "first_event_in_window": None,
+                "last_event_in_window": None,
+                "note": (
+                    "Only events inside the requested range were queried. "
+                    "Offline state before the first observed event or after the last observed "
+                    "event is not inferred."
+                ),
+            },
             "has_offline": False,
             "offline_periods": [],
-            "latest_event_before_or_at_end": None,
-            "previous_event_before_window": None,
-            "next_event_after_window": None,
             "event_count_in_window": 0,
             "heartbeat_count_in_window": 0,
             "summary": {

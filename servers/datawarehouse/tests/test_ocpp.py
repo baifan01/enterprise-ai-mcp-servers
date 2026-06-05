@@ -101,6 +101,70 @@ class OCPPSequenceQueryTest(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result["events"][0]["request"]["truncated"])
         self.assertEqual(len(result["events"][0]["request"]["text"]), 100)
 
+    async def test_query_with_heartbeats_is_limited_to_48_hours(self) -> None:
+        start = dt.datetime(2026, 6, 1, 0, 0, 0)
+        client = FakeClient(
+            QueryResult(
+                columns=[
+                    "sso_id",
+                    "operation_timestamp",
+                    "ocpp_message_type",
+                    "ocpp_request_body",
+                    "ocpp_response_body",
+                ],
+                rows=[],
+            )
+        )
+
+        result = await OCPPSequenceQuery(client).query(
+            sso_id="suby1100012048",
+            time_from=start,
+            time_to=start + dt.timedelta(hours=48),
+            include_heartbeats=True,
+        )
+
+        self.assertEqual(result["event_count"], 0)
+        self.assertEqual(len(client.calls), 1)
+
+        with self.assertRaisesRegex(ValueError, "heartbeats is limited to 48 hours"):
+            await OCPPSequenceQuery(client).query(
+                sso_id="suby1100012048",
+                time_from=start,
+                time_to=start + dt.timedelta(hours=48, seconds=1),
+                include_heartbeats=True,
+            )
+
+    async def test_query_without_heartbeats_is_limited_to_31_days(self) -> None:
+        start = dt.datetime(2026, 6, 1, 0, 0, 0)
+        client = FakeClient(
+            QueryResult(
+                columns=[
+                    "sso_id",
+                    "operation_timestamp",
+                    "ocpp_message_type",
+                    "ocpp_request_body",
+                    "ocpp_response_body",
+                ],
+                rows=[],
+            )
+        )
+
+        result = await OCPPSequenceQuery(client).query(
+            sso_id="suby1100012048",
+            time_from=start,
+            time_to=start + dt.timedelta(days=31),
+        )
+
+        self.assertEqual(result["event_count"], 0)
+        self.assertEqual(len(client.calls), 1)
+
+        with self.assertRaisesRegex(ValueError, "without heartbeats is limited to 31 days"):
+            await OCPPSequenceQuery(client).query(
+                sso_id="suby1100012048",
+                time_from=start,
+                time_to=start + dt.timedelta(days=31, seconds=1),
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

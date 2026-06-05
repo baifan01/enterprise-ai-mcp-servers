@@ -35,8 +35,10 @@ ubi-personal-assistant-data/
     <user_id>/
       workspace/
       readonly/
-        tools/
-          review_site_runtime_by_device.sh
+        local-tools/
+          README.md
+          review-site-runtime-by-device.sh
+          review-site-runtime-by-device.readme.md
       secrets/
         personal-secrets.env
 ```
@@ -44,16 +46,13 @@ ubi-personal-assistant-data/
 工具代码目录：
 
 ```text
-ubi-personal-assistant-mcp-server/
-  local-tools/
+ubi-personal-assistant-mcp-servers/
+  servers/
     driivz-cpms/
+      .venv/
       pyproject.toml
-      uv.lock
       mcp_driivz/
-        cli.py
-        settings.py
-        client.py
-        tools.py
+        ...
 
     datawarehouse/
       ...
@@ -64,18 +63,19 @@ ubi-personal-assistant-mcp-server/
 
 目录含义：
 
-- `users/<user_id>/readonly/tools/` 放该用户可见、可调用的 wrapper。
+- `users/<user_id>/readonly/local-tools/` 放该用户可见、可调用的 wrapper 和同名说明文件。
 - `users/<user_id>/secrets/personal-secrets.env` 放该用户自己的平台级 secret/token，不暴露给 agent。
-- `ubi-personal-assistant-mcp-server/local-tools/` 放真实工具代码，不加入 Copilot CLI 的 `--add-dir`。
+- `ubi-personal-assistant-mcp-servers/servers/<tool>/` 放真实工具代码和该工具自己的 `.venv`，不加入 Copilot CLI 的 `--add-dir`。
 - `shared/` 只放公共 instructions、skills、mcp-config 等，不放所有用户都可见的真实工具入口。
 
 ## 执行链路
 
 ```text
 Agent
-  -> 看到 users/<user_id>/readonly/tools/
+  -> 看到 users/<user_id>/readonly/local-tools/
+  -> 读取 README.md 和同名 .readme.md
   -> 调用某个 wrapper.sh
-  -> wrapper.sh 调用真实 Python tool
+  -> wrapper.sh 使用对应工具目录自己的 .venv/bin/python 调用真实 Python CLI
   -> Python tool 接收 --user-id
   -> Python tool 根据 agent root 定位用户 secret
   -> 读取 users/<user_id>/secrets/personal-secrets.env
@@ -91,8 +91,13 @@ Agent
 
 ```bash
 #!/usr/bin/env bash
-exec uv --directory "/path/to/ubi-personal-assistant-mcp-server/local-tools/driivz-cpms" \
-  run python -m mcp_driivz.cli \
+set -euo pipefail
+
+TOOL_ROOT="/path/to/ubi-personal-assistant-mcp-servers/servers/driivz-cpms"
+PYTHON="$TOOL_ROOT/.venv/bin/python"
+export PYTHONPATH="$TOOL_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
+exec "$PYTHON" -m mcp_driivz.cli \
   review-site-runtime-by-device \
   --user-id "andreas.a.weber@shell.com" \
   "$@"
@@ -101,10 +106,10 @@ exec uv --directory "/path/to/ubi-personal-assistant-mcp-server/local-tools/drii
 Agent 看到和调用的是：
 
 ```bash
-readonly/tools/review_site_runtime_by_device.sh --device-id suby1100008277
+readonly/local-tools/review-site-runtime-by-device.sh suby1100008277
 ```
 
-Agent 不需要知道 secret 文件在哪里，也不需要知道真实 Python package 的内部结构。
+Agent 不需要知道 secret 文件在哪里，也不需要知道真实 Python package 的内部结构。Agent 需要先读取同名说明文件，例如 `review-site-runtime-by-device.readme.md`，了解参数、限制和使用场景。
 
 ## Secret 约定
 
@@ -193,26 +198,26 @@ UBI_AI_AGENT_ROOT=/Users/F.Bai/Documents/Cursor Projects/ubi-personal-assistant-
 核心规则：
 
 ```text
-某用户 readonly/tools 下有哪些 wrapper
+某用户 readonly/local-tools 下有哪些 wrapper
   = 该用户有哪些 local tools 可见和可调用
 ```
 
 例如：
 
 ```text
-users/andreas.../readonly/tools/review_site_runtime_by_device.sh
+users/andreas.../readonly/local-tools/review-site-runtime-by-device.sh
 ```
 
 表示 Andreas 用户可以使用 Driivz CPMS runtime review。
 
-如果某用户没有 Salesforce 权限，则不要在该用户的 `readonly/tools/` 下生成 Salesforce wrapper。
+如果某用户没有 Salesforce 权限，则不要在该用户的 `readonly/local-tools/` 下生成 Salesforce wrapper。
 
 该方案把 MCP 的“tool 可见性控制”转换为文件系统层面的“用户级 wrapper 可见性控制”。
 
 ## 安全边界
 
 - `shared/` 不放真实工具入口，避免所有用户都看到所有工具。
-- `readonly/tools/` 只放 wrapper，不放 secret。
+- `readonly/local-tools/` 只放 wrapper 和说明文件，不放 secret。
 - `secrets/` 不加入 Copilot CLI 的 `--add-dir`。
 - 真实工具代码不加入 Copilot CLI 的 `--add-dir`。
 - 工具只接受白名单参数，不接受任意 URL、任意 SQL、任意 Python 表达式。
@@ -240,7 +245,7 @@ stdio MCP server adapter
 
 ## 待确认问题
 
-- wrapper 由平台自动生成，还是先手工放到用户 `readonly/tools/`？
+- wrapper 由平台自动生成，还是先手工放到用户 `readonly/local-tools/`？
 - `UBI_AI_AGENT_ROOT` 是由 wrapper 固定传入，还是由部署环境统一注入？
 - 是否需要一个 `ubi-tool-runner` gatekeeper 来进一步校验 user/tool 权限？
 - wrapper 是否需要记录审计日志，例如 user、tool、参数摘要、执行时间、成功/失败？

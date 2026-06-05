@@ -1,9 +1,10 @@
 """Device online status query using the legacy Heartbeat gap rule.
 
-This module owns the Databricks OCPP reads needed for a single-device time
-window: the event before the window, all events inside the window, and
-optionally the first event after the window. The actual gap detection stays in
-heartbeat_gap.py so SQL access and legacy-compatible state logic remain
+This module owns the Databricks OCPP read needed for a single-device time
+window. To keep the live tool responsive, it only reads events inside the
+requested range and reports the observed first/last event as coverage metadata;
+it does not query events before or after the range. The actual gap detection
+stays in heartbeat_gap.py so SQL access and legacy-compatible state logic remain
 separate. It intentionally does not read charging attempts or attempt to model a
 full device state timeline.
 """
@@ -19,10 +20,8 @@ from mcp_datawarehouse.models import OCPPEvent, QueryResult
 from mcp_datawarehouse.settings import DatawarehouseSettings
 from mcp_datawarehouse.timestamp_utils import coerce_datetime
 
-ONLINE_STATUS_PREVIOUS_EVENT_QUERY = "charger_ocpp_operations_v.online_status.previous_event"
 ONLINE_STATUS_WINDOW_EVENTS_QUERY = "charger_ocpp_operations_v.online_status.window_events"
-ONLINE_STATUS_NEXT_EVENT_QUERY = "charger_ocpp_operations_v.online_status.next_event"
-EDGE_EVENT_LOOKAROUND_SECONDS = 86_400
+ONLINE_STATUS_MAX_WINDOW = dt.timedelta(days=31)
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +63,8 @@ class DeviceOnlineStatusQuery:
         end = self._require_datetime(time_to, "time_to")
         if start > end:
             raise ValueError("time_from must be earlier than or equal to time_to")
+        if end - start > ONLINE_STATUS_MAX_WINDOW:
+            raise ValueError("online status query is limited to 31 days")
         if heartbeat_interval_seconds <= 0:
             raise ValueError("heartbeat_interval_seconds must be positive")
         if missed_heartbeat_tolerance < 1:
@@ -72,46 +73,25 @@ class DeviceOnlineStatusQuery:
             raise ValueError("recent_end_grace_seconds must be non-negative")
 
         threshold_seconds = heartbeat_interval_seconds * (missed_heartbeat_tolerance + 1)
-        current_time = self._normalize_now(now)
-        edge_lookaround = dt.timedelta(seconds=EDGE_EVENT_LOOKAROUND_SECONDS)
-
         logger.info(
             "Starting online status analysis: sso_id=%s time_from=%s time_to=%s "
-            "offline_threshold_seconds=%s edge_event_lookaround_seconds=%s",
+            "offline_threshold_seconds=%s edge_lookup_enabled=false",
             normalized_sso_id,
             start,
             end,
             threshold_seconds,
-            EDGE_EVENT_LOOKAROUND_SECONDS,
-        )
-        previous_event = await self._query_previous_event(
-            normalized_sso_id,
-            lookback_start=start - edge_lookaround,
-            analysis_start=start,
         )
         window_events = await self._query_window_events(normalized_sso_id, start, end)
-        next_event = None
-        should_query_next = end < current_time and (
-            current_time - end
-        ).total_seconds() > recent_end_grace_seconds
-        if should_query_next:
-            next_event = await self._query_next_event(
-                normalized_sso_id,
-                analysis_end=end,
-                lookahead_end=end + edge_lookaround,
-            )
+        first_event = window_events[0] if window_events else None
+        last_event = window_events[-1] if window_events else None
+        observed_start = first_event.operation_timestamp if first_event else start
+        observed_end = last_event.operation_timestamp if last_event else end
 
-        analysis_events = [event for event in [previous_event, *window_events, next_event] if event]
         offline_periods = analyze_heartbeat_gaps(
-            analysis_events,
-            analysis_start=start,
-            analysis_end=end,
+            window_events,
+            analysis_start=observed_start,
+            analysis_end=observed_end,
             offline_threshold_seconds=threshold_seconds,
-        )
-        latest_event = self._latest_event_before_or_at_end(
-            previous_event=previous_event,
-            window_events=window_events,
-            end=end,
         )
 
         total_offline_seconds = sum(period.duration_seconds for period in offline_periods)
@@ -133,15 +113,23 @@ class DeviceOnlineStatusQuery:
                 "heartbeat_interval_seconds": heartbeat_interval_seconds,
                 "missed_heartbeat_tolerance": missed_heartbeat_tolerance,
                 "offline_threshold_seconds": threshold_seconds,
-                "edge_event_lookaround_seconds": EDGE_EVENT_LOOKAROUND_SECONDS,
                 "recent_end_grace_seconds": recent_end_grace_seconds,
-                "queried_next_event_after_window": should_query_next,
+            },
+            "coverage": {
+                "requested_time_from": start.isoformat(),
+                "requested_time_to": end.isoformat(),
+                "observed_time_from": observed_start.isoformat() if first_event else None,
+                "observed_time_to": observed_end.isoformat() if last_event else None,
+                "first_event_in_window": self._event_to_dict(first_event),
+                "last_event_in_window": self._event_to_dict(last_event),
+                "note": (
+                    "Only events inside the requested range were queried. "
+                    "Offline state before the first observed event or after the last observed "
+                    "event is not inferred."
+                ),
             },
             "has_offline": bool(offline_periods),
             "offline_periods": [offline_period_to_dict(period) for period in offline_periods],
-            "latest_event_before_or_at_end": self._event_to_dict(latest_event),
-            "previous_event_before_window": self._event_to_dict(previous_event),
-            "next_event_after_window": self._event_to_dict(next_event),
             "event_count_in_window": len(window_events),
             "heartbeat_count_in_window": heartbeat_count,
             "summary": {
@@ -188,86 +176,6 @@ class DeviceOnlineStatusQuery:
         )
         return events
 
-    async def _query_previous_event(
-        self,
-        sso_id: str,
-        *,
-        lookback_start: dt.datetime,
-        analysis_start: dt.datetime,
-    ) -> OCPPEvent | None:
-        table = self.client.settings.table("charger_ocpp_operations_v")
-        logger.info(
-            "Querying online status previous event: sso_id=%s lookback_start=%s before=%s",
-            sso_id,
-            lookback_start,
-            analysis_start,
-        )
-        query = f"""
-        SELECT
-            sso_id,
-            operation_timestamp,
-            ocpp_message_type
-        FROM {table}
-        WHERE sso_id = ?
-          AND operation_timestamp >= ?
-          AND operation_timestamp < ?
-        ORDER BY operation_timestamp DESC
-        LIMIT 1
-        """
-        result = await self.client.execute(
-            query,
-            [sso_id, lookback_start, analysis_start],
-            source_query=ONLINE_STATUS_PREVIOUS_EVENT_QUERY,
-        )
-        rows = result.as_dicts()
-        event = self._event_from_row(rows[0]) if rows else None
-        logger.info(
-            "Online status previous event loaded: sso_id=%s found=%s",
-            sso_id,
-            event is not None,
-        )
-        return event
-
-    async def _query_next_event(
-        self,
-        sso_id: str,
-        *,
-        analysis_end: dt.datetime,
-        lookahead_end: dt.datetime,
-    ) -> OCPPEvent | None:
-        table = self.client.settings.table("charger_ocpp_operations_v")
-        logger.info(
-            "Querying online status next event: sso_id=%s after=%s lookahead_end=%s",
-            sso_id,
-            analysis_end,
-            lookahead_end,
-        )
-        query = f"""
-        SELECT
-            sso_id,
-            operation_timestamp,
-            ocpp_message_type
-        FROM {table}
-        WHERE sso_id = ?
-          AND operation_timestamp > ?
-          AND operation_timestamp <= ?
-        ORDER BY operation_timestamp ASC
-        LIMIT 1
-        """
-        result = await self.client.execute(
-            query,
-            [sso_id, analysis_end, lookahead_end],
-            source_query=ONLINE_STATUS_NEXT_EVENT_QUERY,
-        )
-        rows = result.as_dicts()
-        event = self._event_from_row(rows[0]) if rows else None
-        logger.info(
-            "Online status next event loaded: sso_id=%s found=%s",
-            sso_id,
-            event is not None,
-        )
-        return event
-
     def _event_from_row(self, row: dict[str, Any]) -> OCPPEvent:
         timestamp = self._require_datetime(row["operation_timestamp"], "operation_timestamp")
         return OCPPEvent(
@@ -277,19 +185,6 @@ class DeviceOnlineStatusQuery:
             raw=row,
         )
 
-    def _latest_event_before_or_at_end(
-        self,
-        *,
-        previous_event: OCPPEvent | None,
-        window_events: list[OCPPEvent],
-        end: dt.datetime,
-    ) -> OCPPEvent | None:
-        candidates = [event for event in [previous_event, *window_events] if event]
-        before_or_at_end = [event for event in candidates if event.operation_timestamp <= end]
-        if not before_or_at_end:
-            return None
-        return max(before_or_at_end, key=lambda event: event.operation_timestamp)
-
     def _event_to_dict(self, event: OCPPEvent | None) -> dict[str, Any] | None:
         if event is None:
             return None
@@ -298,11 +193,6 @@ class DeviceOnlineStatusQuery:
             "event_time": event.operation_timestamp.isoformat(),
             "event_type": event.ocpp_message_type,
         }
-
-    def _normalize_now(self, value: dt.datetime | None) -> dt.datetime:
-        if value is None:
-            return dt.datetime.utcnow()
-        return value.replace(tzinfo=None)
 
     def _require_datetime(self, value: dt.datetime | str, name: str) -> dt.datetime:
         parsed = coerce_datetime(value)

@@ -17,6 +17,8 @@ from mcp_datawarehouse.settings import DatawarehouseSettings
 from mcp_datawarehouse.timestamp_utils import coerce_datetime
 
 OCPP_SOURCE_QUERY = "charger_ocpp_operations_v"
+OCPP_MAX_WINDOW_WITH_HEARTBEATS = dt.timedelta(hours=48)
+OCPP_MAX_WINDOW_WITHOUT_HEARTBEATS = dt.timedelta(days=31)
 
 
 class QueryClient(Protocol):
@@ -185,6 +187,11 @@ class OCPPSequenceQuery:
             raise ValueError("time_from must be earlier than or equal to time_to")
         if max_payload_chars < 100:
             raise ValueError("max_payload_chars must be at least 100")
+        self._validate_time_window(
+            start=start,
+            end=end,
+            include_heartbeats=include_heartbeats,
+        )
 
         events = await self._fetcher.fetch_events(
             sso_id=normalized_sso_id,
@@ -303,6 +310,26 @@ class OCPPSequenceQuery:
         for event in events:
             counts[event.ocpp_message_type] = counts.get(event.ocpp_message_type, 0) + 1
         return dict(sorted(counts.items()))
+
+    def _validate_time_window(
+        self,
+        *,
+        start: dt.datetime,
+        end: dt.datetime,
+        include_heartbeats: bool,
+    ) -> None:
+        window = end - start
+        max_window = (
+            OCPP_MAX_WINDOW_WITH_HEARTBEATS
+            if include_heartbeats
+            else OCPP_MAX_WINDOW_WITHOUT_HEARTBEATS
+        )
+        if window <= max_window:
+            return
+
+        if include_heartbeats:
+            raise ValueError("OCPP query with heartbeats is limited to 48 hours")
+        raise ValueError("OCPP query without heartbeats is limited to 31 days")
 
     def _require_datetime(self, value: dt.datetime | str, name: str) -> dt.datetime:
         parsed = coerce_datetime(value)

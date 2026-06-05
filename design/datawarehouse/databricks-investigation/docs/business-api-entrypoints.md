@@ -162,6 +162,18 @@ ChargingAttemptsQuery(client).query(...)
 }
 ```
 
+时间范围限制：
+
+```text
+include_heartbeats = true:
+最大查询窗口 48 小时
+
+include_heartbeats = false:
+最大查询窗口 31 天
+```
+
+原因：Heartbeat 噪声很大，长窗口会产生过多 Databricks 结果和大体积 tool response，容易拖慢或打爆调用链。
+
 ### 当前代码入口
 
 ```python
@@ -170,7 +182,7 @@ OCPPSequenceQuery(client).query(...)
 
 文件：
 
-- `servers/datawarehouse/databricks-investigation/src/databricks_investigation/ocpp_sequence_query.py`
+- `servers/datawarehouse/mcp_datawarehouse/ocpp.py`
 
 ### 输出重点
 

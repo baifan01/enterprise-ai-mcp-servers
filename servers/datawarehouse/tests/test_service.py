@@ -17,6 +17,29 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["errors"][0]["type"], "invalid_request")
         self.assertEqual(result["errors"][0]["segment"], "input")
 
+    async def test_ocpp_heartbeat_window_limit_fails_without_databricks_auth(self) -> None:
+        result = await query_ocpp_sequence(
+            sso_id="suby1100012048",
+            time_from="2026-06-01T00:00:00Z",
+            time_to="2026-06-03T00:00:01Z",
+            include_heartbeats=True,
+        )
+
+        self.assertEqual(result["event_count"], 0)
+        self.assertEqual(result["errors"][0]["type"], "invalid_request")
+        self.assertIn("48 hours", result["errors"][0]["message"])
+
+    async def test_ocpp_without_heartbeat_window_limit_fails_without_databricks_auth(self) -> None:
+        result = await query_ocpp_sequence(
+            sso_id="suby1100012048",
+            time_from="2026-05-01T00:00:00Z",
+            time_to="2026-06-01T00:00:01Z",
+        )
+
+        self.assertEqual(result["event_count"], 0)
+        self.assertEqual(result["errors"][0]["type"], "invalid_request")
+        self.assertIn("31 days", result["errors"][0]["message"])
+
     async def test_online_status_invalid_input_fails_without_databricks_auth(self) -> None:
         result = await query_device_online_status(
             sso_id="",
@@ -28,6 +51,18 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["offline_periods"], [])
         self.assertEqual(result["errors"][0]["type"], "invalid_request")
         self.assertEqual(result["errors"][0]["segment"], "input")
+
+    async def test_online_status_window_limit_fails_without_databricks_auth(self) -> None:
+        result = await query_device_online_status(
+            sso_id="suby1100012048",
+            time_from="2026-05-01T00:00:00Z",
+            time_to="2026-06-01T00:00:01Z",
+        )
+
+        self.assertFalse(result["has_offline"])
+        self.assertEqual(result["offline_periods"], [])
+        self.assertEqual(result["errors"][0]["type"], "invalid_request")
+        self.assertIn("31 days", result["errors"][0]["message"])
 
 
 if __name__ == "__main__":
