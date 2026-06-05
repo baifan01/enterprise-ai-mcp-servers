@@ -5,6 +5,10 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+build/
+dist/
+wheels/
+*.egg-info/
 
 # uv / virtual environments
 .venv/
