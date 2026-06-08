@@ -74,3 +74,40 @@ uv run python mcp-design/driivz/restapi-investigation/probe_device.py sebe110000
 | 通过 charger id 找 status 明细 | `GET /v1/chargers/{id}/status` |
 | 通过 identity key 找 charger history | `POST /v1/chargers/identity-key/{identityKey}/history/filter` |
 | 通过 identity key 找 EV transactions | `POST /v1/ev-transactions/chargers/{identityKey}/filter` |
+
+## WebSocket / Network Investigation Notes
+
+已知重连样本设备：
+
+```text
+suby1100007765
+```
+
+当前观察：该 device 疑似持续重建 WebSocket connection。现象描述是 charger 看起来每次都能成功建立连接，但约 5 分钟后又重新建立一次；需要调查是否存在 CPMS 端未及时清理的 stale/zombie WebSocket connection，以及 charger 端是否在不断更换网络身份。
+
+后续优先用以下只读接口观察 network 状态：
+
+```text
+GET /v1/chargers/{id}/network
+POST /v1/chargers/networks/filter
+```
+
+重点字段：
+
+```text
+doesNotCommunicate
+lastReceivedHeartBeat
+connectionUri
+ipAddress
+macAddress
+dynamicIp
+iccid
+imsi
+```
+
+调查目标：
+
+- 多次查询 `suby1100007765` 时，确认 `ipAddress` 是否频繁变化。
+- 如果返回 `macAddress`，确认它是否稳定。
+- 观察 `lastReceivedHeartBeat` 是否持续更新，以及是否和 detailed-log 中 `online: true/false` 状态变化吻合。
+- 如需历史重连证据，优先查 `POST /v1/chargers/detailed-log/filter`，因为当前实测 `POST /v1/chargers/connection-log/filter` 对单 charger 短窗口也可能超时。
