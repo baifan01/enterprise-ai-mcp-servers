@@ -42,6 +42,13 @@ async def query_charging_attempts(
         time_to,
         bool(user_id),
     )
+    user_id_error = _validate_user_id(user_id)
+    if user_id_error is not None:
+        return _failed_result(
+            query={"sso_id": sso_id, "evse_id": evse_id, "time_from": time_from, "time_to": time_to},
+            errors=[user_id_error],
+            kind="attempts",
+        )
     try:
         async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
             result = await ChargingAttemptsQuery(client).query(
@@ -102,6 +109,20 @@ async def query_ocpp_sequence(
         include_raw_payload,
         bool(user_id),
     )
+    user_id_error = _validate_user_id(user_id)
+    if user_id_error is not None:
+        return _failed_result(
+            query={
+                "sso_id": sso_id,
+                "time_from": time_from,
+                "time_to": time_to,
+                "include_heartbeats": include_heartbeats,
+                "include_raw_payload": include_raw_payload,
+                "max_payload_chars": max_payload_chars,
+            },
+            errors=[user_id_error],
+            kind="ocpp",
+        )
     try:
         async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
             result = await OCPPSequenceQuery(client).query(
@@ -186,6 +207,9 @@ async def query_device_online_status(
         "missed_heartbeat_tolerance": missed_heartbeat_tolerance,
         "recent_end_grace_seconds": recent_end_grace_seconds,
     }
+    user_id_error = _validate_user_id(user_id)
+    if user_id_error is not None:
+        return _failed_result(query=query, errors=[user_id_error], kind="online_status")
     try:
         async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
             result = await DeviceOnlineStatusQuery(client).query(
@@ -286,3 +310,14 @@ def _safe_json_value(value: Any) -> Any:
     if isinstance(value, dt.datetime):
         return value.isoformat()
     return value
+
+
+def _validate_user_id(user_id: str | None) -> DatawarehouseServiceError | None:
+    if user_id is not None and user_id.strip():
+        return None
+    return DatawarehouseServiceError(
+        type="invalid_request",
+        message="user_id is required for personal secrets lookup",
+        segment="input",
+        retryable=False,
+    )

@@ -27,7 +27,11 @@ def build_parser() -> argparse.ArgumentParser:
     attempts.add_argument("--evse-id", help="External EVSE ID, resolved to SSO ID.")
     attempts.add_argument("--time-from", required=True, help="Inclusive start timestamp.")
     attempts.add_argument("--time-to", required=True, help="Inclusive end timestamp.")
-    attempts.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
+    attempts.add_argument(
+        "--user-id",
+        required=True,
+        help="Runtime user id for personal secrets lookup.",
+    )
     attempts.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
 
     ocpp = subparsers.add_parser(
@@ -37,7 +41,11 @@ def build_parser() -> argparse.ArgumentParser:
     ocpp.add_argument("--sso-id", required=True, help="Internal device SSO ID.")
     ocpp.add_argument("--time-from", required=True, help="Inclusive start timestamp.")
     ocpp.add_argument("--time-to", required=True, help="Inclusive end timestamp.")
-    ocpp.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
+    ocpp.add_argument(
+        "--user-id",
+        required=True,
+        help="Runtime user id for personal secrets lookup.",
+    )
     ocpp.add_argument(
         "--include-heartbeats",
         action="store_true",
@@ -63,7 +71,11 @@ def build_parser() -> argparse.ArgumentParser:
     online.add_argument("--sso-id", required=True, help="Internal device SSO ID.")
     online.add_argument("--time-from", required=True, help="Inclusive start timestamp.")
     online.add_argument("--time-to", required=True, help="Inclusive end timestamp.")
-    online.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
+    online.add_argument(
+        "--user-id",
+        required=True,
+        help="Runtime user id for personal secrets lookup.",
+    )
     online.add_argument(
         "--heartbeat-interval-seconds",
         type=int,

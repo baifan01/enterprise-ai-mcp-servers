@@ -32,8 +32,8 @@ class FakeClient:
 
 def ocpp_result(rows: list[tuple[str, dt.datetime, str]]) -> QueryResult:
     return QueryResult(
-        columns=["sso_id", "operation_timestamp", "ocpp_message_type"],
-        rows=rows,
+        columns=["sso_id", "operation_timestamp", "ocpp_message_type", "ocpp_request_body"],
+        rows=[(*row, None) for row in rows],
     )
 
 

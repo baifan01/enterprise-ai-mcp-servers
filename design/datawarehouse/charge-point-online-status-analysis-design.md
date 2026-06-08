@@ -131,43 +131,58 @@ offline_threshold_seconds = 1800
 
 ### 4.3 疑似掉线判断
 
-当遇到当前事件为 `Heartbeat` 时：
+对相邻两条 OCPP event 计算 gap：
 
 ```text
-如果存在 previous Heartbeat；
-并且 current Heartbeat - previous Heartbeat > offline_threshold_seconds；
-并且 previous Heartbeat 之后没有任何其他 OCPP event；
+如果 previous event 不是 charging-related event；
+并且 current event - previous event > offline_threshold_seconds；
 则输出一个疑似掉线区间。
 ```
 
-第一版继续使用旧代码的隐含判断：
+第一版只把以下事件视为 charging-related event：
 
-```python
-last_heartbeat_time == last_event_time
+```text
+StartTransaction
+StatusNotification(status = "Charging")
 ```
 
-后续如果需要更清晰 evidence，可以改成显式字段：
+这些事件之后的长 gap 暂不判掉线，因为当前已知有些充电桩充电期间不发 Heartbeat，也不发 MeterValues。
 
-```python
-events_since_last_heartbeat: list[ConnectivityEvent]
+其他事件都不算 charging-related，包括：
+
+```text
+Heartbeat
+StatusNotification(Available)
+StatusNotification(Preparing)
+StatusNotification(Finishing)
+StopTransaction
+MeterValues
+BootNotification
 ```
 
-但第一版不必扩大实现范围。
+因此：
+
+```text
+Heartbeat -> 其他 OCPP event，gap 超阈值：判疑似掉线
+StatusNotification(Available) -> 其他 OCPP event，gap 超阈值：判疑似掉线
+StartTransaction -> 其他 OCPP event，gap 超阈值：不判疑似掉线
+StatusNotification(Charging) -> 其他 OCPP event，gap 超阈值：不判疑似掉线
+```
 
 ### 4.4 掉线开始时间
 
 为了贴近旧代码，第一版使用：
 
 ```text
-offline_start = previous_heartbeat_time
-offline_restore = current_heartbeat_time
+offline_start = previous_event_time
+offline_restore = current_event_time
 ```
 
 也就是说，如果：
 
 ```text
-previous Heartbeat: 10:00
-current Heartbeat: 10:50
+previous event: 10:00 Heartbeat
+current OCPP event: 10:50
 threshold: 30 分钟
 ```
 
@@ -379,34 +394,28 @@ servers/datawarehouse/mcp_datawarehouse/online_status.py
 def analyze_heartbeat_gaps(events, analysis_start, analysis_end, threshold):
     sorted_events = sorted(events, key=lambda event: event.event_time)
 
-    last_heartbeat_time = None
-    last_event_time = None
-    last_event_type = None
+    previous_event = None
     offline_periods = []
 
     for event in sorted_events:
-        if event.event_type == "Heartbeat":
-            if last_heartbeat_time is not None:
-                gap_seconds = (event.event_time - last_heartbeat_time).total_seconds()
+        if previous_event is not None and not is_charging_related(previous_event):
+            gap_seconds = (event.event_time - previous_event.event_time).total_seconds()
 
-                if gap_seconds > threshold and last_heartbeat_time == last_event_time:
-                    raw_start = last_heartbeat_time
-                    raw_restore = event.event_time
-                    clipped = clip_to_window(raw_start, raw_restore, analysis_start, analysis_end)
-                    if clipped is not None:
-                        offline_periods.append(
-                            build_offline_period(
-                                clipped=clipped,
-                                raw_start=raw_start,
-                                raw_restore=raw_restore,
-                                previous_event_type=last_event_type,
-                            )
+            if gap_seconds > threshold:
+                raw_start = previous_event.event_time
+                raw_restore = event.event_time
+                clipped = clip_to_window(raw_start, raw_restore, analysis_start, analysis_end)
+                if clipped is not None:
+                    offline_periods.append(
+                        build_offline_period(
+                            clipped=clipped,
+                            raw_start=raw_start,
+                            raw_restore=raw_restore,
+                            restore_event_type=event.event_type,
                         )
+                    )
 
-            last_heartbeat_time = event.event_time
-
-        last_event_time = event.event_time
-        last_event_type = event.event_type
+        previous_event = event
 
     return offline_periods
 ```

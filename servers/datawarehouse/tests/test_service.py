@@ -11,6 +11,7 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
             sso_id="",
             time_from="2026-06-03T19:00:00Z",
             time_to="2026-06-03T20:00:00Z",
+            user_id="fan.bai@ubitricity.com",
         )
 
         self.assertEqual(result["event_count"], 0)
@@ -22,6 +23,7 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
             sso_id="suby1100012048",
             time_from="2026-06-01T00:00:00Z",
             time_to="2026-06-03T00:00:01Z",
+            user_id="fan.bai@ubitricity.com",
             include_heartbeats=True,
         )
 
@@ -34,6 +36,7 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
             sso_id="suby1100012048",
             time_from="2026-05-01T00:00:00Z",
             time_to="2026-06-01T00:00:01Z",
+            user_id="fan.bai@ubitricity.com",
         )
 
         self.assertEqual(result["event_count"], 0)
@@ -45,6 +48,7 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
             sso_id="",
             time_from="2026-06-03T19:00:00Z",
             time_to="2026-06-03T20:00:00Z",
+            user_id="fan.bai@ubitricity.com",
         )
 
         self.assertFalse(result["has_offline"])
@@ -57,12 +61,24 @@ class ServiceTest(unittest.IsolatedAsyncioTestCase):
             sso_id="suby1100012048",
             time_from="2026-05-01T00:00:00Z",
             time_to="2026-06-01T00:00:01Z",
+            user_id="fan.bai@ubitricity.com",
         )
 
         self.assertFalse(result["has_offline"])
         self.assertEqual(result["offline_periods"], [])
         self.assertEqual(result["errors"][0]["type"], "invalid_request")
         self.assertIn("31 days", result["errors"][0]["message"])
+
+    async def test_online_status_requires_user_id_before_databricks_auth(self) -> None:
+        result = await query_device_online_status(
+            sso_id="suby1100012048",
+            time_from="2026-06-03T19:00:00Z",
+            time_to="2026-06-03T20:00:00Z",
+        )
+
+        self.assertFalse(result["has_offline"])
+        self.assertEqual(result["errors"][0]["type"], "invalid_request")
+        self.assertIn("user_id is required", result["errors"][0]["message"])
 
 
 if __name__ == "__main__":

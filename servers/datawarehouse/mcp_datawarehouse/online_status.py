@@ -156,7 +156,8 @@ class DeviceOnlineStatusQuery:
         SELECT
             sso_id,
             operation_timestamp,
-            ocpp_message_type
+            ocpp_message_type,
+            ocpp_request_body
         FROM {table}
         WHERE sso_id = ?
           AND operation_timestamp >= ?
@@ -182,6 +183,7 @@ class DeviceOnlineStatusQuery:
             sso_id=str(row["sso_id"]),
             operation_timestamp=timestamp,
             ocpp_message_type=str(row["ocpp_message_type"]),
+            ocpp_request_body=row.get("ocpp_request_body"),
             raw=row,
         )
 
