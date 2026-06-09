@@ -1,0 +1,20 @@
+[project]
+name = "ubi-mcp-atlassian"
+version = "0.1.0"
+description = "Atlassian Jira and Confluence core service for ubi-personal-assistant."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.14.1",
+    "ubi-mcp-common",
+]
+
+[tool.uv.sources]
+ubi-mcp-common = { path = "../common" }
+
+[project.scripts]
+atlassian = "mcp_atlassian.cli:main"
+
+[tool.uv]
+package = false

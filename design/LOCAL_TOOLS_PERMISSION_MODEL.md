@@ -12,7 +12,7 @@ Shell Copilot policy 当前禁用了 third-party MCP servers。验证结果显�
 Driivz CPMS MCP
 Datawarehouse MCP
 Salesforce MCP
-Atlassian / Jira MCP
+Atlassian MCP
 ```
 
 但 Copilot CLI 仍可以读取授权目录中的文件，并执行本地命令。因此第一阶段采用 local tool wrapper 方案：由 agent 调用用户可见的 wrapper script，wrapper 再调用平台控制的真实 Python tool。
@@ -134,11 +134,99 @@ query-ocpp-sequence.sh
 query-ocpp-sequence.readme.md
 ```
 
+如果同一平台下 tool 数量较多，可以使用平台级 grouped wrapper，通过 subcommand 区分方法。为了控制风险，推荐至少按读写分组：
+
+```text
+atlassian-read.sh
+atlassian-read.readme.md
+
+atlassian-write.sh
+atlassian-write.readme.md
+```
+
+例如：
+
+```bash
+readonly/local-tools/atlassian-read.sh search-tickets ...
+readonly/local-tools/atlassian-read.sh read-ticket ...
+readonly/local-tools/atlassian-read.sh search-wiki-pages ...
+readonly/local-tools/atlassian-read.sh read-wiki-page ...
+
+readonly/local-tools/atlassian-write.sh create-wiki-child-page ...
+readonly/local-tools/atlassian-write.sh update-wiki-page ...
+```
+
+读写 wrapper 分离后：
+
+- read wrapper 只包含查询和读取类 subcommands。
+- write wrapper 包含创建、更新、评论、上传附件等会修改外部系统的 subcommands。
+- wrapper 仍然固定写入当前 `user_id`，调用方不传 `--user-id`。
+- `.readme.md` 必须列出该 grouped wrapper 支持的 subcommands、参数、风险等级和示例。
+- 未来如需更细权限，可在 Python CLI 或 wrapper 生成策略中按 subcommand 校验。
+
+Grouped wrapper 的 `.readme.md` 不应承载所有 subcommand 的完整说明，避免 prompt 注入内容过长。推荐使用两层文档：
+
+```text
+readonly/local-tools/
+  atlassian-read.sh
+  atlassian-read.readme.md
+  atlassian-write.sh
+  atlassian-write.readme.md
+  docs/
+    atlassian/
+      search-tickets.md
+      read-ticket.md
+      search-wiki-pages.md
+      read-wiki-page.md
+      create-wiki-child-page.md
+      update-wiki-page.md
+```
+
+同名 `.readme.md` 作为轻量索引，只包含：
+
+- wrapper 是 read 还是 write；
+- 通用命令格式，例如 `<wrapper>.sh <subcommand> [args...]`；
+- 支持的 subcommand 列表；
+- 每个 subcommand 的一句话用途；
+- 对应详细说明文档路径；
+- 使用前必须读取目标 subcommand 详细文档的要求；
+- write wrapper 的外部系统修改风险提醒。
+
+详细参数、限制、示例、输出字段说明放在 `docs/<platform>/<subcommand>.md` 中。AgentRuntime prompt 只需要告诉 agent 先读取 wrapper 同名 readme，再按 readme 引用读取目标 subcommand 文档，不把所有 subcommand 细节直接注入 prompt。
+
+## Tool Docstring Metadata
+
+未来 wrapper index README、subcommand 详细说明和平台 tool registry 应从公开 tool/subcommand 方法的 docstring metadata 生成，而不是手工维护多份文档。内部规范见 `design/LOCAL_TOOL_DOCSTRING_METADATA.md`。
+
+该规范固定少量机器可解析块：
+
+```text
+Tool
+When to use
+Parameters
+Examples
+Output
+Safety
+```
+
+平台生成器的大致解析流程：
+
+1. 从 CLI registry 或显式 tool registry 找到公开 subcommands。
+2. 读取对应 Python callable 的函数签名、类型注解和默认值。
+3. 读取 docstring，并按固定块名解析 `Tool`、`When to use`、`Parameters`、`Examples`、`Output`、`Safety`。
+4. 校验 `Tool.name`、`Tool.wrapper`、`Tool.mode`、`Tool.summary` 等必填 metadata。
+5. 校验 `Parameters` 块和真实函数签名一致。
+6. 按 `Tool.wrapper` 分组生成 grouped wrapper index README。
+7. 按 `Tool.platform` 和 `Tool.name` 生成 `docs/<platform>/<subcommand>.md` 详细说明。
+8. 如果 docstring 缺失必填块或 metadata 与 CLI 注册不一致，构建或发布流程失败。
+
+解析实现可以复用 `griffe`、`docstring-parser` 或等价 Python docstring 解析库。若库不能直接理解自定义块，生成器可以先取得 docstring 原文，再按固定块标题做轻量切分；业务语义以 `design/LOCAL_TOOL_DOCSTRING_METADATA.md` 为准。
+
 生成要求：
 
 - `.sh` 是唯一可执行入口，文件存在表示该用户可以调用该 local tool。
-- `.readme.md` 是该 wrapper 的详细说明，必须与 `.sh` 同名。
-- `.readme.md` 至少包含用途、适用问题、命令格式、参数说明、时间范围限制、示例、输出重点和使用注意事项。
+- 单命令 wrapper 的 `.readme.md` 是该 wrapper 的完整说明，必须与 `.sh` 同名。
+- grouped wrapper 的 `.readme.md` 是轻量索引；详细参数、限制、示例、输出字段说明放在 `docs/<platform>/<subcommand>.md`。
 - `.sh` 内固定写入当前 `user_id`，调用方不传 `--user-id`。
 - `.sh` 使用对应工具代码目录自己的 `.venv/bin/python`，不使用统一 runtime venv，也不依赖 `uv run`。
 - `.sh` 不写入 token、password、secret 文件路径或其他敏感值。
@@ -148,7 +236,8 @@ AgentRuntime 的提示词应告诉 agent：
 ```text
 User-approved local tools may exist under readonly/local-tools/.
 Each callable tool is a .sh file.
-Before using a tool, read its same-name .readme.md file for purpose, parameters, limits, and examples.
+Before using a tool, read its same-name .readme.md file.
+For grouped wrappers, read the referenced docs/<platform>/<subcommand>.md before calling a subcommand.
 Do not pass --user-id; wrappers already bind the current user.
 ```
 
@@ -179,6 +268,11 @@ DATABRICKS_TOKEN=...
 SALESFORCE_CLIENT_ID=...
 SALESFORCE_CLIENT_SECRET=...
 SALESFORCE_USERNAME=...
+
+# Atlassian
+ATLASSIAN_BASE_URL=...
+ATLASSIAN_EMAIL=...
+ATLASSIAN_API_TOKEN=...
 ```
 
 推荐权限：
@@ -223,7 +317,7 @@ UBI_AI_AGENT_ROOT=/Users/F.Bai/Documents/Cursor Projects/ubi-personal-assistant-
 3. 如果仍不完整，则由 client/auth 校验返回明确失败。
 ```
 
-例如 Driivz 工具读取 `DRIIVZ_*` credential，Datawarehouse 工具读取 `DATABRICKS_*` credential，Salesforce 工具读取 `SALESFORCE_*` credential。未来如果每个用户运行在自己的 Docker/container 中，平台可以直接把同一组标准 credential 变量注入容器；本地 local tool 模式下则使用 personal secrets 文件作为 fallback。
+例如 Driivz 工具读取 `DRIIVZ_*` credential，Datawarehouse 工具读取 `DATABRICKS_*` credential，Salesforce 工具读取 `SALESFORCE_*` credential，Atlassian 工具读取 `ATLASSIAN_*` credential。未来如果每个用户运行在自己的 Docker/container 中，平台可以直接把同一组标准 credential 变量注入容器；本地 local tool 模式下则使用 personal secrets 文件作为 fallback。
 
 实现要求：
 

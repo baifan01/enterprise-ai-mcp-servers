@@ -21,4 +21,5 @@ Hard rules:
 - Catch third-party boundary exceptions and convert them into explicit failures.
 - Add focused unit tests and integration tests for core behavior.
 - Keep changes scoped to the requested feature or fix.
+- When creating public methods exposed as local tools or wrapper subcommands, write docstrings that follow `design/LOCAL_TOOL_DOCSTRING_METADATA.md`.
 - If a design choice is unclear, stop and ask before implementing.
