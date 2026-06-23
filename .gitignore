@@ -20,3 +20,6 @@ wheels/
 
 # Investigation outputs
 responses/
+
+# Server-local temporary investigations
+servers/**/design/investigation/
