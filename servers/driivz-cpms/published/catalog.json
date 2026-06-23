@@ -1,0 +1,21 @@
+{
+  "schema_version": "1",
+  "display_name": "Driivz CPMS",
+  "python_module": "mcp_driivz.cli",
+  "wrappers": [
+    {
+      "wrapper_id": "driivz-read",
+      "mode": "read",
+      "display_name": "Driivz Read",
+      "summary": "Read-only Driivz CPMS runtime tools.",
+      "requires_user_id": true,
+      "subcommands": [
+        {
+          "name": "review-site-runtime-by-key",
+          "summary": "Review Driivz charger, site, status, and recent session context by key.",
+          "published_at": "2026-06-23T11:29:06Z"
+        }
+      ]
+    }
+  ]
+}

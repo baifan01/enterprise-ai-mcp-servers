@@ -1,0 +1,31 @@
+{
+  "schema_version": "1",
+  "display_name": "Data Warehouse",
+  "python_module": "mcp_datawarehouse.cli",
+  "wrappers": [
+    {
+      "wrapper_id": "databricks-read",
+      "mode": "read",
+      "display_name": "Databricks Read",
+      "summary": "Read-only Databricks data warehouse tools.",
+      "requires_user_id": true,
+      "subcommands": [
+        {
+          "name": "query-charging-attempts",
+          "summary": "Query charging attempts for one device or EVSE in a time window.",
+          "published_at": "2026-06-23T11:29:06Z"
+        },
+        {
+          "name": "query-ocpp-sequence",
+          "summary": "Query a compact OCPP event sequence for one device window.",
+          "published_at": "2026-06-23T11:29:06Z"
+        },
+        {
+          "name": "query-device-online-status",
+          "summary": "Analyze Heartbeat gaps to identify device offline periods.",
+          "published_at": "2026-06-23T11:29:06Z"
+        }
+      ]
+    }
+  ]
+}

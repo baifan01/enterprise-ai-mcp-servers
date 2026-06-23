@@ -32,7 +32,6 @@ async def read_wiki_page(
         name: read-wiki-page
         wrapper: atlassian-read
         mode: read
-        platform: atlassian
         summary: Read one Confluence page and return normalized page content.
 
     When to use:
@@ -117,7 +116,6 @@ async def search_wiki_pages(
         name: search-wiki-pages
         wrapper: atlassian-read
         mode: read
-        platform: atlassian
         summary: Search Confluence pages by title or body text.
 
     When to use:
@@ -215,7 +213,6 @@ async def create_wiki_child_page(
         name: create-wiki-child-page
         wrapper: atlassian-write
         mode: write
-        platform: atlassian
         summary: Create a Confluence child page under a required parent page or folder.
 
     When to use:
@@ -299,7 +296,6 @@ async def update_wiki_page(
         name: update-wiki-page
         wrapper: atlassian-write
         mode: write
-        platform: atlassian
         summary: Replace one Confluence page body using a required page URL.
 
     When to use:

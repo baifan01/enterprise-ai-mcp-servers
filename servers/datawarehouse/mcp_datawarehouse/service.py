@@ -30,7 +30,47 @@ async def query_charging_attempts(
     evse_id: str | None = None,
     user_id: str | None = None,
 ) -> dict[str, Any]:
-    """Return charging attempts and adjacent user-level merges for a device window."""
+    """Return charging attempts and adjacent user-level merges for a device window.
+
+    Tool:
+        name: query-charging-attempts
+        wrapper: databricks-read
+        mode: read
+        summary: Query charging attempts for one device or EVSE in a time window.
+
+    When to use:
+        Use when the user needs charging session attempt context for a known
+        internal SSO ID or external EVSE ID in a bounded time range, including
+        adjacent attempts that may belong to the same user-level journey.
+
+    Parameters:
+        time_from:
+            Required inclusive start timestamp. Accepts ISO-8601 strings or
+            datetime values.
+        time_to:
+            Required inclusive end timestamp. Accepts ISO-8601 strings or
+            datetime values.
+        sso_id:
+            Optional internal device SSO ID. Provide either sso_id or evse_id.
+        evse_id:
+            Optional external EVSE ID. Provide either evse_id or sso_id; the
+            query resolves it to an internal SSO ID when needed.
+        user_id:
+            Runtime user id for personal secrets lookup. Wrappers bind this; the
+            agent must not pass it directly.
+
+    Examples:
+        databricks-read.sh query-charging-attempts --sso-id suby1100012048 --time-from 2026-06-03T19:00:00Z --time-to 2026-06-03T20:00:00Z
+        databricks-read.sh query-charging-attempts --evse-id DE*UBI*E123456 --time-from 2026-06-03T19:00:00Z --time-to 2026-06-03T20:00:00Z
+
+    Output:
+        JSON with query metadata, raw_attempt_count, merged_attempt_count,
+        raw_attempts, merged_attempts, had_adjacent_merge, and errors.
+
+    Safety:
+        Read-only. Executes fixed Databricks SQL through structured parameters
+        and does not accept arbitrary SQL.
+    """
 
     logger.info(
         "Starting data warehouse service request: kind=attempts sso_id=%s evse_id=%s "
@@ -95,7 +135,54 @@ async def query_ocpp_sequence(
     include_raw_payload: bool = False,
     max_payload_chars: int = 1200,
 ) -> dict[str, Any]:
-    """Return a compact OCPP event sequence for a device window."""
+    """Return a compact OCPP event sequence for a device window.
+
+    Tool:
+        name: query-ocpp-sequence
+        wrapper: databricks-read
+        mode: read
+        summary: Query a compact OCPP event sequence for one device window.
+
+    When to use:
+        Use when the user needs chronological OCPP operation evidence for a
+        device in a bounded time range, especially to inspect start, stop,
+        authorization, status notification, or transaction behavior around an
+        incident.
+
+    Parameters:
+        sso_id:
+            Required internal device SSO ID.
+        time_from:
+            Required inclusive start timestamp. Accepts ISO-8601 strings or
+            datetime values.
+        time_to:
+            Required inclusive end timestamp. Accepts ISO-8601 strings or
+            datetime values.
+        user_id:
+            Runtime user id for personal secrets lookup. Wrappers bind this; the
+            agent must not pass it directly.
+        include_heartbeats:
+            If true, include Heartbeat events in the sequence. Defaults to
+            false to keep output focused.
+        include_raw_payload:
+            If true, include bounded raw request and response payload snippets.
+            Defaults to false.
+        max_payload_chars:
+            Maximum raw payload characters per request or response when raw
+            payloads are included. Defaults to 1200.
+
+    Examples:
+        databricks-read.sh query-ocpp-sequence --sso-id suby1100012048 --time-from 2026-06-03T19:20:00Z --time-to 2026-06-03T19:30:00Z
+        databricks-read.sh query-ocpp-sequence --sso-id suby1100012048 --time-from 2026-06-03T19:20:00Z --time-to 2026-06-03T19:30:00Z --include-raw-payload --max-payload-chars 2000
+
+    Output:
+        JSON with query metadata, event_count, event_type_counts, ordered events,
+        optional bounded payload snippets, and errors.
+
+    Safety:
+        Read-only. Executes fixed Databricks SQL through structured parameters.
+        Raw payload output is disabled by default and bounded when enabled.
+    """
 
     logger.info(
         "Starting data warehouse service request: kind=ocpp sso_id=%s time_from=%s "
@@ -182,7 +269,52 @@ async def query_device_online_status(
     missed_heartbeat_tolerance: int = 1,
     recent_end_grace_seconds: int = 1800,
 ) -> dict[str, Any]:
-    """Return legacy-compatible Heartbeat gap offline periods for a device window."""
+    """Return legacy-compatible Heartbeat gap offline periods for a device window.
+
+    Tool:
+        name: query-device-online-status
+        wrapper: databricks-read
+        mode: read
+        summary: Analyze Heartbeat gaps to identify device offline periods.
+
+    When to use:
+        Use when the user asks whether a charge point was online or offline in a
+        specific time window, or needs Heartbeat gap evidence compatible with the
+        legacy online-status analysis.
+
+    Parameters:
+        sso_id:
+            Required internal device SSO ID.
+        time_from:
+            Required inclusive start timestamp. Accepts ISO-8601 strings or
+            datetime values.
+        time_to:
+            Required inclusive end timestamp. Accepts ISO-8601 strings or
+            datetime values.
+        user_id:
+            Runtime user id for personal secrets lookup. Wrappers bind this; the
+            agent must not pass it directly.
+        heartbeat_interval_seconds:
+            Expected Heartbeat interval in seconds. Defaults to 900.
+        missed_heartbeat_tolerance:
+            Number of missed Heartbeats tolerated before flagging an offline
+            gap. Defaults to 1.
+        recent_end_grace_seconds:
+            Skip querying the next event when time_to is this close to now.
+            Defaults to 1800.
+
+    Examples:
+        databricks-read.sh query-device-online-status --sso-id suby1100012048 --time-from 2026-06-03T19:00:00Z --time-to 2026-06-03T20:00:00Z
+        databricks-read.sh query-device-online-status --sso-id suby1100012048 --time-from 2026-06-03T19:00:00Z --time-to 2026-06-03T20:00:00Z --heartbeat-interval-seconds 900 --missed-heartbeat-tolerance 2
+
+    Output:
+        JSON with query metadata, coverage, has_offline, offline_periods,
+        event_count_in_window, heartbeat_count_in_window, summary, and errors.
+
+    Safety:
+        Read-only. Executes fixed Databricks SQL through structured parameters
+        and infers offline periods only from events in the requested range.
+    """
 
     logger.info(
         "Starting data warehouse service request: kind=online_status sso_id=%s "

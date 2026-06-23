@@ -7,7 +7,7 @@
 ## 设计目标
 
 - 让 tool 的调用说明靠近实现代码，减少 README、wrapper 注册信息和真实参数之间的漂移。
-- 支持平台从代码自动生成用户可见的 `*.readme.md` 和 `docs/<platform>/<subcommand>.md`。
+- 支持平台从代码自动生成用户可见的 `*.readme.md` 和 `published/doc/<wrapper_id>/<subcommand>.md`。
 - 让 agent 看到简洁、稳定的工具说明，而不是把所有工具细节一次性注入 prompt。
 - 让发布流程可以校验公开 tool 是否具备必要的安全说明和输出说明。
 
@@ -69,7 +69,6 @@ Safety
 | `wrapper` | 是 | `atlassian-read` | 所属 grouped wrapper，不含 `.sh` 后缀。 |
 | `mode` | 是 | `read` | 权限模式。第一版使用 `read` 或 `write`。 |
 | `summary` | 是 | `Search Confluence pages by title or body text.` | 一句话用途，会进入 wrapper index。 |
-| `platform` | 建议 | `atlassian` | 平台名，用于生成 `docs/<platform>/...`。 |
 
 `mode` 必须和 `wrapper` 一致：`read` 方法不能进入 write wrapper；会修改外部系统的方法不能标记为 `read`。
 
@@ -94,7 +93,6 @@ def search_wiki_pages(
         name: search-wiki-pages
         wrapper: atlassian-read
         mode: read
-        platform: atlassian
         summary: Search Confluence pages by title or body text.
 
     When to use:
@@ -154,11 +152,13 @@ MCP servers 项目的发布生成器根据该规范产生两类环境无关的�
 servers/<server_id>/
   published/
     catalog.json
-  docs/
-    search-wiki-pages.md
-    read-wiki-page.md
-    create-wiki-child-page.md
-    update-wiki-page.md
+    doc/
+      atlassian-read/
+        search-wiki-pages.md
+        read-wiki-page.md
+      atlassian-write/
+        create-wiki-child-page.md
+        update-wiki-page.md
 ```
 
 `published/catalog.json` 是 `ubi-ai` 可读取的结构化 tool catalog，应包含：
@@ -177,7 +177,7 @@ servers/<server_id>/
 
 `server_id` 不写入 catalog；`ubi-ai` 通过扫描 `<mcp_servers_root>/<server_id>/published/catalog.json`，使用 server 子目录名作为 `server_id`。
 
-`docs/<subcommand>.md` 是 subcommand 详细说明，由对应公开方法的 docstring metadata 一比一生成，应包含：
+`published/doc/<wrapper_id>/<subcommand>.md` 是 subcommand 详细说明，由对应公开方法的 docstring metadata 一比一生成，应包含：
 
 - `When to use`；
 - 参数表，来自函数签名和 `Parameters` 块；
@@ -190,7 +190,7 @@ servers/<server_id>/
 ```text
 readonly/local-tools/<wrapper>.sh
 readonly/local-tools/<wrapper>.readme.md
-readonly/local-tools/docs/<server_id>/<subcommand>.md
+readonly/local-tools/docs/<wrapper_id>/<subcommand>.md
 ```
 
 这些文件由 `ubi-ai` 根据 catalog、用户授权、`user_id` 和 MCP servers 根目录动态 materialize。`ubi-ai` 会按实际授权 command 裁剪 wrapper 和 wrapper readme，并从 MCP servers 发布产物中拷贝已授权 subcommand 的详细说明文档。
@@ -206,7 +206,7 @@ readonly/local-tools/docs/<server_id>/<subcommand>.md
 5. 解析 `Tool` 块里的 `key: value` 字段。
 6. 执行校验规则。
 7. 按 `Tool.wrapper` 分组生成 wrapper index。
-8. 按 `Tool.platform` 和 `Tool.name` 生成 subcommand 详细文档。
+8. 按 `Tool.wrapper` 和 `Tool.name` 生成 subcommand 详细文档。
 
 如果底层 docstring parser 不能直接识别自定义块，生成器可以在拿到 docstring 原文后，用固定块标题做轻量切分；不要把解析逻辑绑定到自然语言内容。
 

@@ -26,7 +26,45 @@ async def review_site_runtime_by_key(
     user_id: str | None = None,
     include_recent_sessions: bool = True,
 ) -> dict[str, Any]:
-    """Return Driivz site runtime context by company device ID or EVSE ID."""
+    """Return Driivz site runtime context by company device ID or EVSE ID.
+
+    Tool:
+        name: review-site-runtime-by-key
+        wrapper: driivz-read
+        mode: read
+        summary: Review Driivz charger, site, status, and recent session context by key.
+
+    When to use:
+        Use when the user provides a company device ID or Driivz EVSE ID and
+        needs CPMS runtime context, including charger identity, site/company
+        details, current status, and optionally recent EV transactions.
+
+    Parameters:
+        key:
+            Required company device ID or Driivz EVSE ID.
+        key_type:
+            One of: auto, device_id, evse_id. Defaults to auto; auto treats keys
+            containing "*" as EVSE IDs and other values as company device IDs.
+        user_id:
+            Runtime user id for personal secrets lookup. Wrappers bind this; the
+            agent must not pass it directly.
+        include_recent_sessions:
+            If true, also fetch recent EV transaction context for the resolved
+            charger identity. Defaults to true.
+
+    Examples:
+        driivz-read.sh review-site-runtime-by-key sebe1100000213
+        driivz-read.sh review-site-runtime-by-key "DE*UBI*E123456" --key-type evse_id
+        driivz-read.sh review-site-runtime-by-key sebe1100000213 --no-recent-sessions
+
+    Output:
+        JSON with requested key metadata, resolved flag, profile, location,
+        site, site_program, status, optional recent_sessions, and errors.
+
+    Safety:
+        Read-only. Calls fixed Driivz REST endpoints with structured filters and
+        does not modify CPMS data.
+    """
 
     normalized_key = key.strip()
     if not normalized_key:

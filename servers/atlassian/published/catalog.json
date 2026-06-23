@@ -1,0 +1,45 @@
+{
+  "schema_version": "1",
+  "display_name": "Atlassian",
+  "python_module": "mcp_atlassian.cli",
+  "wrappers": [
+    {
+      "wrapper_id": "atlassian-read",
+      "mode": "read",
+      "display_name": "Atlassian Read",
+      "summary": "Read-only Atlassian tools.",
+      "requires_user_id": true,
+      "subcommands": [
+        {
+          "name": "read-wiki-page",
+          "summary": "Read one Confluence page and return normalized page content.",
+          "published_at": "2026-06-23T11:29:06Z"
+        },
+        {
+          "name": "search-wiki-pages",
+          "summary": "Search Confluence pages by title or body text.",
+          "published_at": "2026-06-23T11:29:06Z"
+        }
+      ]
+    },
+    {
+      "wrapper_id": "atlassian-write",
+      "mode": "write",
+      "display_name": "Atlassian Write",
+      "summary": "Write Atlassian Confluence wiki pages.",
+      "requires_user_id": true,
+      "subcommands": [
+        {
+          "name": "create-wiki-child-page",
+          "summary": "Create a Confluence child page under a required parent page or folder.",
+          "published_at": "2026-06-23T11:29:06Z"
+        },
+        {
+          "name": "update-wiki-page",
+          "summary": "Replace one Confluence page body using a required page URL.",
+          "published_at": "2026-06-23T11:29:06Z"
+        }
+      ]
+    }
+  ]
+}
