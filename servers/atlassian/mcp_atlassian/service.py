@@ -25,7 +25,6 @@ async def read_wiki_page(
     page_url: str | None = None,
     include_footer_comments: bool = False,
     user_id: str | None = None,
-    settings: AtlassianSettings | None = None,
 ) -> dict[str, Any]:
     """Read a Confluence wiki page by id or browser URL.
 
@@ -83,7 +82,7 @@ async def read_wiki_page(
         "include_footer_comments": include_footer_comments,
     }
     try:
-        async with AtlassianClient(settings or AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
             result = await WikiService(client).read_page(
                 page_id=page_id,
                 page_url=page_url,
@@ -111,7 +110,6 @@ async def search_wiki_pages(
     match: str = "all",
     max_results: int = 10,
     user_id: str | None = None,
-    settings: AtlassianSettings | None = None,
 ) -> dict[str, Any]:
     """Search Confluence wiki pages with structured parameters.
 
@@ -179,7 +177,7 @@ async def search_wiki_pages(
         "max_results": max_results,
     }
     try:
-        async with AtlassianClient(settings or AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
             result = await WikiService(client).search_pages(
                 text=text,
                 search_field=search_field,
@@ -210,7 +208,6 @@ async def create_wiki_child_page(
     body_markdown: str,
     mark_agent_friendly: bool = False,
     user_id: str | None = None,
-    settings: AtlassianSettings | None = None,
 ) -> dict[str, Any]:
     """Create a Confluence child page from supported Markdown.
 
@@ -266,7 +263,7 @@ async def create_wiki_child_page(
         "mark_agent_friendly": mark_agent_friendly,
     }
     try:
-        async with AtlassianClient(settings or AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
             result = await WikiService(client).create_child_page(
                 parent_url=parent_url,
                 title=title,
@@ -295,7 +292,6 @@ async def update_wiki_page(
     title: str | None = None,
     version_message: str | None = None,
     user_id: str | None = None,
-    settings: AtlassianSettings | None = None,
 ) -> dict[str, Any]:
     """Update an existing Confluence wiki page from supported Markdown.
 
@@ -356,7 +352,7 @@ async def update_wiki_page(
         "has_version_message": bool(version_message),
     }
     try:
-        async with AtlassianClient(settings or AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
             result = await WikiService(client).update_page(
                 page_url=page_url,
                 body_markdown=body_markdown,

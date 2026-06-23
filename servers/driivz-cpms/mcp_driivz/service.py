@@ -25,7 +25,6 @@ async def review_site_runtime_by_key(
     key_type: KeyType = "auto",
     user_id: str | None = None,
     include_recent_sessions: bool = True,
-    settings: DriivzSettings | None = None,
 ) -> dict[str, Any]:
     """Return Driivz site runtime context by company device ID or EVSE ID."""
 
@@ -51,7 +50,7 @@ async def review_site_runtime_by_key(
         return _base_result(key=key, key_type=key_type, resolved=False, errors=[error])
 
     try:
-        async with DriivzClient(settings or DriivzSettings(user_id=user_id)) as client:
+        async with DriivzClient(DriivzSettings(user_id=user_id)) as client:
             return await _review_with_client(
                 client,
                 normalized_key,

@@ -29,7 +29,6 @@ async def query_charging_attempts(
     sso_id: str | None = None,
     evse_id: str | None = None,
     user_id: str | None = None,
-    settings: DatawarehouseSettings | None = None,
 ) -> dict[str, Any]:
     """Return charging attempts and adjacent user-level merges for a device window."""
 
@@ -50,7 +49,7 @@ async def query_charging_attempts(
             kind="attempts",
         )
     try:
-        async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
+        async with DatabricksClient(DatawarehouseSettings(user_id=user_id)) as client:
             result = await ChargingAttemptsQuery(client).query(
                 sso_id=sso_id,
                 evse_id=evse_id,
@@ -95,7 +94,6 @@ async def query_ocpp_sequence(
     include_heartbeats: bool = False,
     include_raw_payload: bool = False,
     max_payload_chars: int = 1200,
-    settings: DatawarehouseSettings | None = None,
 ) -> dict[str, Any]:
     """Return a compact OCPP event sequence for a device window."""
 
@@ -124,7 +122,7 @@ async def query_ocpp_sequence(
             kind="ocpp",
         )
     try:
-        async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
+        async with DatabricksClient(DatawarehouseSettings(user_id=user_id)) as client:
             result = await OCPPSequenceQuery(client).query(
                 sso_id=sso_id,
                 time_from=time_from,
@@ -183,7 +181,6 @@ async def query_device_online_status(
     heartbeat_interval_seconds: int = 900,
     missed_heartbeat_tolerance: int = 1,
     recent_end_grace_seconds: int = 1800,
-    settings: DatawarehouseSettings | None = None,
 ) -> dict[str, Any]:
     """Return legacy-compatible Heartbeat gap offline periods for a device window."""
 
@@ -211,7 +208,7 @@ async def query_device_online_status(
     if user_id_error is not None:
         return _failed_result(query=query, errors=[user_id_error], kind="online_status")
     try:
-        async with DatabricksClient(settings or DatawarehouseSettings(user_id=user_id)) as client:
+        async with DatabricksClient(DatawarehouseSettings(user_id=user_id)) as client:
             result = await DeviceOnlineStatusQuery(client).query(
                 sso_id=sso_id,
                 time_from=time_from,
