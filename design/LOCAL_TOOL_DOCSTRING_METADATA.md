@@ -144,43 +144,56 @@ def search_wiki_pages(
 9. 函数签名中的公开参数必须在 `Parameters` 中有说明。
 10. `Safety` 对 write 方法必须明确说明会修改哪个外部系统。
 
-校验失败时，平台生成器或发布流程应失败，不生成新的 wrapper/readme。
+校验失败时，平台生成器或发布流程应失败，不生成新的 catalog 或 subcommand 文档。
 
 ## 生成器输出
 
-生成器根据该规范产生两类文档：
+MCP servers 项目的发布生成器根据该规范产生两类环境无关的发布产物：
 
 ```text
-readonly/local-tools/
-  atlassian-read.sh
-  atlassian-read.readme.md
-  atlassian-write.sh
-  atlassian-write.readme.md
+servers/<server_id>/
+  published/
+    catalog.json
   docs/
-    atlassian/
-      search-wiki-pages.md
-      read-wiki-page.md
-      create-wiki-child-page.md
-      update-wiki-page.md
+    search-wiki-pages.md
+    read-wiki-page.md
+    create-wiki-child-page.md
+    update-wiki-page.md
 ```
 
-同名 `*.readme.md` 是 grouped wrapper index，应包含：
+`published/catalog.json` 是 `ubi-ai` 可读取的结构化 tool catalog，应包含：
 
-- wrapper 是 read 还是 write；
-- 通用命令格式；
-- subcommand 列表；
-- 每个 subcommand 的 `Tool.summary`；
-- 对应详细文档路径；
-- 使用前读取详细文档的提醒；
-- write wrapper 的外部系统修改风险提醒。
+- `schema_version`；
+- `display_name`；
+- `python_module`；
+- `wrappers[].wrapper_id`；
+- `wrappers[].mode`；
+- `wrappers[].display_name`；
+- `wrappers[].summary`；
+- `wrappers[].requires_user_id`；
+- `wrappers[].subcommands[].name`；
+- `wrappers[].subcommands[].summary`；
+- `wrappers[].subcommands[].published_at`。
 
-`docs/<platform>/<subcommand>.md` 是 subcommand 详细说明，应包含：
+`server_id` 不写入 catalog；`ubi-ai` 通过扫描 `<mcp_servers_root>/<server_id>/published/catalog.json`，使用 server 子目录名作为 `server_id`。
+
+`docs/<subcommand>.md` 是 subcommand 详细说明，由对应公开方法的 docstring metadata 一比一生成，应包含：
 
 - `When to use`；
 - 参数表，来自函数签名和 `Parameters` 块；
 - `Examples`；
 - `Output`；
 - `Safety`。
+
+发布生成器不生成用户目录下的 wrapper 文件或 wrapper readme：
+
+```text
+readonly/local-tools/<wrapper>.sh
+readonly/local-tools/<wrapper>.readme.md
+readonly/local-tools/docs/<server_id>/<subcommand>.md
+```
+
+这些文件由 `ubi-ai` 根据 catalog、用户授权、`user_id` 和 MCP servers 根目录动态 materialize。`ubi-ai` 会按实际授权 command 裁剪 wrapper 和 wrapper readme，并从 MCP servers 发布产物中拷贝已授权 subcommand 的详细说明文档。
 
 ## 解析建议
 

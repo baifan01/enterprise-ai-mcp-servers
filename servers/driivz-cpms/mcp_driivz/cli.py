@@ -7,32 +7,40 @@ import asyncio
 import json
 from typing import Any
 
-from mcp_driivz.service import review_site_runtime_by_device
+from mcp_driivz.service import review_site_runtime_by_key
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Driivz CPMS core service CLI.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    review = subparsers.add_parser(
-        "review-site-runtime-by-device",
-        help="Review site/runtime context by company device ID.",
+    review_key = subparsers.add_parser(
+        "review-site-runtime-by-key",
+        help="Review site/runtime context by company device ID or EVSE ID.",
     )
-    review.add_argument("device_id", help="Company device ID / Driivz identityKey.")
-    review.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
-    review.add_argument(
+    review_key.add_argument("key", help="Company device ID / Driivz EVSE ID.")
+    review_key.add_argument(
+        "--key-type",
+        choices=("auto", "device_id", "evse_id"),
+        default="auto",
+        help="How to interpret the key. Auto treats values containing '*' as EVSE IDs.",
+    )
+    review_key.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
+    review_key.add_argument(
         "--no-recent-sessions",
         action="store_true",
         help="Skip the recent EV transaction lookup.",
     )
-    review.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
+    review_key.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
+
     return parser
 
 
 async def run(args: argparse.Namespace) -> dict[str, Any]:
-    if args.command == "review-site-runtime-by-device":
-        return await review_site_runtime_by_device(
-            args.device_id,
+    if args.command == "review-site-runtime-by-key":
+        return await review_site_runtime_by_key(
+            args.key,
+            key_type=args.key_type,
             user_id=args.user_id,
             include_recent_sessions=not args.no_recent_sessions,
         )

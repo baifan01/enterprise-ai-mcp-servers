@@ -16,42 +16,62 @@ SITE_API = "GET /v1/sites/{siteId}"
 SITE_PROGRAM_API = "GET /v1/companies/{site.companyId}"
 STATUS_API = "POST /v1/chargers/statuses/filter"
 RECENT_SESSIONS_API = "POST /v1/ev-transactions/chargers/{identityKey}/filter"
+KeyType = str
 
 
-async def review_site_runtime_by_device(
-    device_id: str,
+async def review_site_runtime_by_key(
+    key: str,
     *,
+    key_type: KeyType = "auto",
     user_id: str | None = None,
     include_recent_sessions: bool = True,
     settings: DriivzSettings | None = None,
 ) -> dict[str, Any]:
-    """Return the first-version Driivz site runtime review JSON."""
+    """Return Driivz site runtime context by company device ID or EVSE ID."""
 
-    normalized_device_id = device_id.strip()
-    if not normalized_device_id:
+    normalized_key = key.strip()
+    if not normalized_key:
         error = DriivzServiceError(
             type="invalid_request",
-            message="device_id must not be empty.",
+            message="key must not be empty.",
             segment="input",
             retryable=False,
         )
-        return _base_result(device_id=device_id, resolved=False, errors=[error])
+        return _base_result(key=key, key_type=key_type, resolved=False, errors=[error])
+
+    try:
+        resolved_key_type = _resolve_key_type(normalized_key, key_type)
+    except ValueError as exc:
+        error = DriivzServiceError(
+            type="invalid_request",
+            message=str(exc),
+            segment="input",
+            retryable=False,
+        )
+        return _base_result(key=key, key_type=key_type, resolved=False, errors=[error])
 
     try:
         async with DriivzClient(settings or DriivzSettings(user_id=user_id)) as client:
             return await _review_with_client(
                 client,
-                normalized_device_id,
+                normalized_key,
+                key_type=resolved_key_type,
                 include_recent_sessions=include_recent_sessions,
             )
     except DriivzServiceError as exc:
-        return _base_result(device_id=device_id, resolved=False, errors=[exc])
+        return _base_result(
+            key=normalized_key,
+            key_type=resolved_key_type,
+            resolved=False,
+            errors=[exc],
+        )
 
 
 async def _review_with_client(
     client: DriivzClient,
-    device_id: str,
+    key: str,
     *,
+    key_type: KeyType,
     include_recent_sessions: bool,
 ) -> dict[str, Any]:
     errors: list[DriivzServiceError] = []
@@ -59,17 +79,18 @@ async def _review_with_client(
         profile = await client.post_json(
             "/v1/chargers/profiles/filter",
             params={"pageSize": 20, "pageNumber": 0},
-            body={"identityKey": device_id},
+            body=_profile_filter_body(key, key_type),
             source_api=PROFILE_API,
         )
     except DriivzServiceError as exc:
         exc.segment = exc.segment or "profile"
-        return _base_result(device_id=device_id, resolved=False, errors=[exc])
+        return _base_result(key=key, key_type=key_type, resolved=False, errors=[exc])
 
     if not profile.ok:
         error = result_to_error(profile, segment="profile")
         return _base_result(
-            device_id=device_id,
+            key=key,
+            key_type=key_type,
             resolved=False,
             profile=_segment_with_error(profile, error),
             errors=[error],
@@ -79,7 +100,7 @@ async def _review_with_client(
     if len(profile_data) == 0:
         error = DriivzServiceError(
             type="not_found",
-            message="No charger profile found for device_id.",
+            message="No charger profile found for key.",
             segment="profile",
             source_api=PROFILE_API,
             http_status=profile.status_code,
@@ -87,7 +108,8 @@ async def _review_with_client(
             retryable=False,
         )
         return _base_result(
-            device_id=device_id,
+            key=key,
+            key_type=key_type,
             resolved=False,
             profile=_segment_with_error(profile, error),
             errors=[error],
@@ -95,7 +117,7 @@ async def _review_with_client(
     if len(profile_data) > 1:
         error = DriivzServiceError(
             type="ambiguous_result",
-            message="Multiple charger profiles found for device_id.",
+            message="Multiple charger profiles found for key.",
             segment="profile",
             source_api=PROFILE_API,
             http_status=profile.status_code,
@@ -103,7 +125,8 @@ async def _review_with_client(
             retryable=False,
         )
         return _base_result(
-            device_id=device_id,
+            key=key,
+            key_type=key_type,
             resolved=False,
             profile=_segment_with_error(profile, error),
             errors=[error],
@@ -112,6 +135,7 @@ async def _review_with_client(
     charger = profile_data[0]
     charger_id = charger.get("id") if isinstance(charger, dict) else None
     site_id = charger.get("siteId") if isinstance(charger, dict) else None
+    device_id = _extract_identity_key(charger) or (key if key_type == "device_id" else None)
 
     tasks: dict[str, asyncio.Task[ApiResult | None]] = {}
     if isinstance(site_id, int):
@@ -135,7 +159,7 @@ async def _review_with_client(
                 source_api=STATUS_API,
             )
         )
-    if include_recent_sessions:
+    if include_recent_sessions and device_id:
         tasks["recent_sessions"] = asyncio.create_task(
             _fetch_recent_sessions(client, device_id)
         )
@@ -172,6 +196,8 @@ async def _review_with_client(
             segments["site_program"] = _error_segment(SITE_PROGRAM_API, exc)
 
     return {
+        "key": key,
+        "key_type": key_type,
         "device_id": device_id,
         "resolved": True,
         **segments,
@@ -224,13 +250,16 @@ async def _collect_segments(
 
 def _base_result(
     *,
-    device_id: str,
+    key: str,
+    key_type: KeyType,
     resolved: bool,
     errors: list[DriivzServiceError],
     profile: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
-        "device_id": device_id,
+        "key": key,
+        "key_type": key_type,
+        "device_id": key if key_type == "device_id" else None,
         "resolved": resolved,
         "profile": profile,
         "location": None,
@@ -260,6 +289,28 @@ def _error_segment(source_api: str, error: DriivzServiceError) -> dict[str, Any]
 
 def _as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
+
+
+def _resolve_key_type(key: str, key_type: KeyType) -> KeyType:
+    normalized = key_type.strip().lower()
+    if normalized == "auto":
+        return "evse_id" if "*" in key else "device_id"
+    if normalized in {"device_id", "evse_id"}:
+        return normalized
+    raise ValueError("key_type must be one of: auto, device_id, evse_id.")
+
+
+def _profile_filter_body(key: str, key_type: KeyType) -> dict[str, Any]:
+    if key_type == "evse_id":
+        return {"evseIds": [key]}
+    return {"identityKey": key}
+
+
+def _extract_identity_key(charger: Any) -> str | None:
+    if not isinstance(charger, dict):
+        return None
+    value = charger.get("identityKey")
+    return value if isinstance(value, str) and value else None
 
 
 def _extract_company_id(site_segment: Any) -> int | None:
