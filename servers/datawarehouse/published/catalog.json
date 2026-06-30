@@ -2,6 +2,29 @@
   "schema_version": "1",
   "display_name": "Data Warehouse",
   "python_module": "mcp_datawarehouse.cli",
+  "config_keys": [
+    {
+      "key": "DATABRICKS_SERVER_HOSTNAME",
+      "scope": "user",
+      "description": "User-specific Databricks server hostname.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "DATABRICKS_HTTP_PATH",
+      "scope": "user",
+      "description": "User-specific Databricks SQL warehouse HTTP path.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "DATABRICKS_TOKEN",
+      "scope": "user",
+      "description": "User-specific Databricks access token.",
+      "secret": true,
+      "required": true
+    }
+  ],
   "wrappers": [
     {
       "wrapper_id": "databricks-read",

@@ -166,6 +166,11 @@ servers/<server_id>/
 - `schema_version`；
 - `display_name`；
 - `python_module`；
+- `config_keys[].key`；
+- `config_keys[].scope`；
+- `config_keys[].description`；
+- `config_keys[].secret`；
+- `config_keys[].required`；
 - `wrappers[].wrapper_id`；
 - `wrappers[].mode`；
 - `wrappers[].display_name`；
@@ -177,6 +182,127 @@ servers/<server_id>/
 
 `server_id` 不写入 catalog；`ubi-ai` 通过扫描 `<mcp_servers_root>/<server_id>/published/catalog.json`，使用 server 子目录名作为 `server_id`。
 
+`published/catalog.json` 的整体结构固定为：
+
+```json
+{
+  "schema_version": "1",
+  "display_name": "Atlassian",
+  "python_module": "mcp_atlassian.cli",
+  "config_keys": [
+    {
+      "key": "ATLASSIAN_BASE_URL",
+      "scope": "system",
+      "description": "Atlassian site base URL.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "ATLASSIAN_API_TOKEN",
+      "scope": "user",
+      "description": "User-specific Atlassian API token.",
+      "secret": true,
+      "required": true
+    }
+  ],
+  "wrappers": [
+    {
+      "wrapper_id": "atlassian-read",
+      "mode": "read",
+      "display_name": "Atlassian Read",
+      "summary": "Read-only Atlassian wiki and ticket tools.",
+      "requires_user_id": false,
+      "subcommands": [
+        {
+          "name": "search-wiki-pages",
+          "summary": "Search Confluence pages by title or body text.",
+          "published_at": "2026-06-23T11:29:06Z"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Catalog 字段规则：
+
+| 字段 | 必填 | 来源 | 说明 |
+| --- | --- | --- | --- |
+| `schema_version` | 是 | server-level publish metadata/template | Catalog schema 版本。第一版固定为字符串 `"1"`。 |
+| `display_name` | 是 | server-level publish metadata/template | 给 admin/UI 展示的 server 名称。不得作为 `server_id` 使用。 |
+| `python_module` | 是 | server-level publish metadata/template | broker/local execution 调用的 Python module，例如 `mcp_atlassian.cli`。 |
+| `config_keys` | 是 | Settings-derived publish metadata/template | server 级配置项数组。没有配置项时使用空数组。 |
+| `wrappers` | 是 | subcommand docstring metadata 分组 + server-level wrapper metadata | wrapper/grouped command 数组。 |
+
+Wrapper 字段规则：
+
+| 字段 | 必填 | 来源 | 说明 |
+| --- | --- | --- | --- |
+| `wrapper_id` | 是 | `Tool.wrapper` | wrapper 名称，不含 `.sh` 后缀；在当前 server 内唯一。 |
+| `mode` | 是 | `Tool.mode` | 权限模式。第一版使用 `read` 或 `write`。同一 wrapper 下所有 subcommands 必须一致。 |
+| `display_name` | 是 | server-level wrapper metadata 或由 `wrapper_id` 稳定生成 | UI 展示名。 |
+| `summary` | 是 | server-level wrapper metadata 或 wrapper 下 subcommand summary 聚合 | wrapper 一句话说明。 |
+| `requires_user_id` | 是 | server-level wrapper metadata/template | 兼容字段。新 broker/config 方案下默认 `false`，不代表 credential lookup。 |
+| `subcommands` | 是 | subcommand docstring metadata | wrapper 下公开 subcommand 数组。 |
+
+Subcommand 字段规则：
+
+| 字段 | 必填 | 来源 | 说明 |
+| --- | --- | --- | --- |
+| `name` | 是 | `Tool.name` | CLI subcommand 名称，必须和真实 CLI 注册名一致。 |
+| `summary` | 是 | `Tool.summary` | subcommand 一句话说明。 |
+| `published_at` | 是 | 发布生成器运行时写入 | ISO-8601 UTC 时间戳，用于追踪发布产物生成时间。 |
+
+生成器必须校验 catalog：
+
+1. 顶层只能包含 `schema_version`、`display_name`、`python_module`、`config_keys`、`wrappers`。
+2. `schema_version` 必须是支持的版本，第一版为 `"1"`。
+3. `python_module` 非空，且不能包含 shell 参数、空白分隔命令或文件系统路径。
+4. `wrappers[].wrapper_id` 在同一 server 内唯一。
+5. `wrappers[].mode` 必须是允许值，且与该 wrapper 下所有 subcommand 的 `Tool.mode` 一致。
+6. `wrappers[].subcommands[].name` 在同一 wrapper 内唯一，并与真实 CLI subcommand 注册名一致。
+7. `published_at` 必须是 UTC ISO-8601 字符串。
+8. catalog 不包含真实配置值、secret、用户 id、wrapper materialization token 或本地用户目录路径。
+
+`config_keys` 是 server 级配置项定义。配置 UI 直接展示 `config_keys[].key`，catalog 不提供 `config_keys[].display_name`。catalog 只声明配置 metadata，不包含真实 token、password、默认 secret 值或 secret 文件路径。
+
+`config_keys` 不从单个 subcommand docstring 自动推导，也不由发布生成器根据参数名猜测。每个 server 的 Settings / 配置定义是 config key 的源头；Settings 声明真实 tool 子进程会读取哪些环境变量、这些变量是否为 secret、是否 required，以及建议的 user/system scope。发布生成器生成 `published/catalog.json` 时，必须从 server-level Settings-derived publish metadata/template 读取 `config_keys`，再和 subcommand docstring metadata 生成的 wrapper/subcommand 信息合并成完整 catalog。subcommand docstring 只负责公开命令的 `Tool`、参数、示例、输出和安全说明，不负责声明连接凭据。
+
+`config_keys` 数据结构固定为：
+
+```json
+{
+  "key": "ATLASSIAN_API_TOKEN",
+  "scope": "user",
+  "description": "User-specific Atlassian API token.",
+  "secret": true,
+  "required": true
+}
+```
+
+字段规则：
+
+| 字段 | 必填 | 示例 | 说明 |
+| --- | --- | --- | --- |
+| `key` | 是 | `ATLASSIAN_API_TOKEN` | 配置 key，同时也是真实 tool 子进程读取的环境变量名。必须在同一个 server catalog 内唯一。 |
+| `scope` | 是 | `user` | 配置值归属范围。只能是 `user` 或 `system`。`user` 由用户维护，`system` 由管理员维护。 |
+| `description` | 是 | `User-specific Atlassian API token.` | 给配置页面展示的说明。不得包含 token、password、默认值或其他 secret。 |
+| `secret` | 是 | `true` | 是否需要加密存储并在前端隐藏明文。token/password 通常为 `true`；URL、catalog/schema 等非敏感配置通常为 `false`。 |
+| `required` | 是 | `true` | 该 key 是否为工具执行所需配置。缺失 required config 时，真实 tool 执行应返回明确配置错误。 |
+
+生成器必须校验：
+
+1. `config_keys` 存在且为数组；没有配置项的 server 使用空数组。
+2. 每个 item 只能包含上述字段；不得包含 `display_name`、真实值、默认 secret、文件路径或用户 id。
+3. `key` 非空，并符合环境变量命名习惯：大写字母、数字和下划线。
+4. 同一 server 内 `key` 不重复。
+5. `scope` 只能是 `user` 或 `system`。
+6. `description` 非空，且不得包含明显 secret 示例。
+7. `secret` 和 `required` 必须是 boolean。
+8. 如果 catalog 中已有同名 key 的历史发布约定，不能静默改变 `secret` 语义；这会影响 `ubi-ai` 侧已有数据库值的加解密处理，需要人工迁移。
+
+发布出的 tool 代码必须从 `config_keys[].key` 对应的环境变量读取连接信息、token 和 password。上线 broker 执行路径中，`ubi-ai` 从数据库读取 user/system scope 配置并注入真实 tool 子进程环境；MCP servers 工具不得再根据 `user_id` 或 `UBI_AI_AGENT_ROOT` 读取 `users/<user_id>/secrets/personal-secrets.env`。
+
 `published/doc/<wrapper_id>/<subcommand>.md` 是 subcommand 详细说明，由对应公开方法的 docstring metadata 一比一生成，应包含：
 
 - `When to use`；
@@ -184,6 +310,8 @@ servers/<server_id>/
 - `Examples`；
 - `Output`；
 - `Safety`。
+
+`published/doc` 是生成产物，不作为人工修改的 source of truth。未来 broker 配置方案落地后，大部分公开工具方法不再需要 `user_id` 参数；应先修改函数签名和 docstring metadata，再重新生成 `published/doc`。配置、token、password 由 `ubi-ai` broker 注入真实 tool 子进程环境，公开方法文档不应再把 `user_id` 描述为 personal secrets lookup 输入。
 
 发布生成器不生成用户目录下的 wrapper 文件或 wrapper readme：
 

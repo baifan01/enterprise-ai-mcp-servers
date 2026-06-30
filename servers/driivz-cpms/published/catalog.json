@@ -2,6 +2,29 @@
   "schema_version": "1",
   "display_name": "Driivz CPMS",
   "python_module": "mcp_driivz.cli",
+  "config_keys": [
+    {
+      "key": "DRIIVZ_BASE_URL",
+      "scope": "system",
+      "description": "System-level Driivz API Gateway base URL.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "DRIIVZ_USERNAME",
+      "scope": "user",
+      "description": "User-specific Driivz username.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "DRIIVZ_PASSWORD",
+      "scope": "user",
+      "description": "User-specific Driivz password.",
+      "secret": true,
+      "required": true
+    }
+  ],
   "wrappers": [
     {
       "wrapper_id": "driivz-read",

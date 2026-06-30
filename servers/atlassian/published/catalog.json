@@ -2,6 +2,29 @@
   "schema_version": "1",
   "display_name": "Atlassian",
   "python_module": "mcp_atlassian.cli",
+  "config_keys": [
+    {
+      "key": "ATLASSIAN_BASE_URL",
+      "scope": "system",
+      "description": "Atlassian site base URL.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "ATLASSIAN_EMAIL",
+      "scope": "user",
+      "description": "User-specific Atlassian account email.",
+      "secret": false,
+      "required": true
+    },
+    {
+      "key": "ATLASSIAN_API_TOKEN",
+      "scope": "user",
+      "description": "User-specific Atlassian API token.",
+      "secret": true,
+      "required": true
+    }
+  ],
   "wrappers": [
     {
       "wrapper_id": "atlassian-read",
