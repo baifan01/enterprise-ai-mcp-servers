@@ -215,7 +215,7 @@ def _notification_block(warnings: list[ConversionWarning]) -> str:
         for warning in warnings
     )
     return (
-        "<ac:structured-macro ac:name=\"warning\"><ac:rich-text-body>"
+        '<ac:structured-macro ac:name="warning"><ac:rich-text-body>'
         "<p>This page was generated from Markdown. Some content could not be fully converted.</p>"
         f"<ul>{items}</ul>"
         "</ac:rich-text-body></ac:structured-macro>"
@@ -242,7 +242,10 @@ def _is_pipe_table_start(lines: list[str], index: int) -> bool:
         return False
     header = lines[index].strip()
     separator = lines[index + 1].strip()
-    return "|" in header and re.match(r"^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$", separator) is not None
+    return (
+        "|" in header
+        and re.match(r"^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$", separator) is not None
+    )
 
 
 def _split_table_row(row: str) -> list[str]:

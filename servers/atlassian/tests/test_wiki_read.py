@@ -41,7 +41,9 @@ class FakeClient:
                             "authorId": "712020:comment",
                             "createdAt": "2024-01-01T00:00:00.000Z",
                             "updatedAt": "2024-01-02T00:00:00.000Z",
-                            "body": {"storage": {"representation": "storage", "value": "<p>Comment</p>"}},
+                            "body": {
+                                "storage": {"representation": "storage", "value": "<p>Comment</p>"}
+                            },
                         }
                     ]
                 },
@@ -61,7 +63,10 @@ PAGE_BODY = {
     "authorId": "712020:user",
     "version": {"number": 6},
     "body": {"storage": {"representation": "storage", "value": "<p>Body</p>"}},
-    "_links": {"base": "https://ubitricity.atlassian.net/wiki", "webui": "/spaces/UM/pages/5781061778/Page"},
+    "_links": {
+        "base": "https://ubitricity.atlassian.net/wiki",
+        "webui": "/spaces/UM/pages/5781061778/Page",
+    },
 }
 
 
@@ -87,7 +92,9 @@ class WikiReadTest(unittest.IsolatedAsyncioTestCase):
     async def test_reads_footer_comments_when_requested(self) -> None:
         client = FakeClient()
 
-        result = await WikiService(client).read_page(page_id="5781061778", include_footer_comments=True)
+        result = await WikiService(client).read_page(
+            page_id="5781061778", include_footer_comments=True
+        )
 
         self.assertEqual(result["footer_comments"][0]["id"], "c1")
         self.assertEqual(result["footer_comments"][0]["author"]["display_name"], "Fan Bai")
@@ -95,7 +102,9 @@ class WikiReadTest(unittest.IsolatedAsyncioTestCase):
     async def test_comment_failure_does_not_fail_page_read(self) -> None:
         client = FakeClient(fail_comments=True)
 
-        result = await WikiService(client).read_page(page_id="5781061778", include_footer_comments=True)
+        result = await WikiService(client).read_page(
+            page_id="5781061778", include_footer_comments=True
+        )
 
         self.assertEqual(result["footer_comments"], [])
         self.assertEqual(result["warnings"][0]["type"], "footer_comments_failed")

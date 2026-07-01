@@ -217,13 +217,17 @@ class WikiService:
             )
         return {
             "id": _string_or_none(updated.get("id")) or page_id,
-            "parent_id": _string_or_none(updated.get("parentId")) or _string_or_none(current.get("parentId")),
-            "parent_type": _string_or_none(updated.get("parentType")) or _string_or_none(current.get("parentType")),
-            "space_id": _string_or_none(updated.get("spaceId")) or _string_or_none(current.get("spaceId")),
+            "parent_id": _string_or_none(updated.get("parentId"))
+            or _string_or_none(current.get("parentId")),
+            "parent_type": _string_or_none(updated.get("parentType"))
+            or _string_or_none(current.get("parentType")),
+            "space_id": _string_or_none(updated.get("spaceId"))
+            or _string_or_none(current.get("spaceId")),
             "status": _string_or_none(updated.get("status")),
             "title": _string_or_none(updated.get("title")) or next_title,
             "version_number": _version_number(updated),
-            "web_url": _web_url(updated, base_url=self._base_url) or _web_url(current, base_url=self._base_url),
+            "web_url": _web_url(updated, base_url=self._base_url)
+            or _web_url(current, base_url=self._base_url),
             "labels": [AI_GENERATED_LABEL],
             "conversion_warnings": [warning.to_dict() for warning in converted.warnings],
             "warnings": warnings,
@@ -293,7 +297,9 @@ class WikiService:
         warnings: list[dict[str, Any]] = []
         user_cache: dict[str, dict[str, str | None]] = {}
         owner = await self._enrich_user(_string_or_none(page.get("ownerId")), user_cache, warnings)
-        author = await self._enrich_user(_string_or_none(page.get("authorId")), user_cache, warnings)
+        author = await self._enrich_user(
+            _string_or_none(page.get("authorId")), user_cache, warnings
+        )
         page_id = _string_or_none(page.get("id"))
         comments: list[dict[str, Any]] = []
         if include_footer_comments and page_id:

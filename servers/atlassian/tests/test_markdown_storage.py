@@ -36,7 +36,7 @@ class MarkdownStorageTest(unittest.TestCase):
 
         self.assertEqual(len(result.warnings), 1)
         self.assertEqual(result.warnings[0].type, "unsupported_image")
-        self.assertIn("ac:name=\"warning\"", result.value)
+        self.assertIn('ac:name="warning"', result.value)
         self.assertIn("[Unsupported image]", result.value)
         self.assertIn("./architecture.png", result.value)
 

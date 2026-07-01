@@ -75,7 +75,7 @@ async def query_charging_attempts(
         evse_id,
         time_from,
         time_to,
-           )
+    )
     try:
         async with DatabricksClient(DatawarehouseSettings()) as client:
             result = await ChargingAttemptsQuery(client).query(
@@ -86,7 +86,12 @@ async def query_charging_attempts(
             )
     except DatawarehouseServiceError as exc:
         return _failed_result(
-            query={"sso_id": sso_id, "evse_id": evse_id, "time_from": time_from, "time_to": time_to},
+            query={
+                "sso_id": sso_id,
+                "evse_id": evse_id,
+                "time_from": time_from,
+                "time_to": time_to,
+            },
             errors=[exc],
             kind="attempts",
         )
@@ -98,7 +103,12 @@ async def query_charging_attempts(
             retryable=False,
         )
         return _failed_result(
-            query={"sso_id": sso_id, "evse_id": evse_id, "time_from": time_from, "time_to": time_to},
+            query={
+                "sso_id": sso_id,
+                "evse_id": evse_id,
+                "time_from": time_from,
+                "time_to": time_to,
+            },
             errors=[error],
             kind="attempts",
         )
@@ -176,7 +186,7 @@ async def query_ocpp_sequence(
         time_to,
         include_heartbeats,
         include_raw_payload,
-           )
+    )
     try:
         async with DatabricksClient(DatawarehouseSettings()) as client:
             result = await OCPPSequenceQuery(client).query(
@@ -291,7 +301,7 @@ async def query_device_online_status(
         heartbeat_interval_seconds,
         missed_heartbeat_tolerance,
         recent_end_grace_seconds,
-           )
+    )
     query = {
         "sso_id": sso_id,
         "time_from": time_from,
@@ -400,4 +410,3 @@ def _safe_json_value(value: Any) -> Any:
     if isinstance(value, dt.datetime):
         return value.isoformat()
     return value
-

@@ -32,7 +32,9 @@ def build_parser() -> argparse.ArgumentParser:
     read.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
 
     search = subparsers.add_parser("search-wiki-pages", help="Search Confluence wiki pages.")
-    search.add_argument("text", nargs="*", help="Keyword text. Multiple values are matched by --match.")
+    search.add_argument(
+        "text", nargs="*", help="Keyword text. Multiple values are matched by --match."
+    )
     search.add_argument("--search-field", default="text", choices=["text", "title"])
     search.add_argument("--parent-url", help="Confluence parent page browser URL.")
     search.add_argument("--agent-friendly-only", action="store_true")
@@ -44,7 +46,9 @@ def build_parser() -> argparse.ArgumentParser:
         "create-wiki-child-page",
         help="Create a Confluence child page from supported Markdown.",
     )
-    create.add_argument("--parent-url", required=True, help="Confluence parent page or folder browser URL.")
+    create.add_argument(
+        "--parent-url", required=True, help="Confluence parent page or folder browser URL."
+    )
     create.add_argument("--title", required=True, help="New page title.")
     create.add_argument("--body-markdown", required=True, help="Markdown body content.")
     create.add_argument("--mark-agent-friendly", action="store_true")

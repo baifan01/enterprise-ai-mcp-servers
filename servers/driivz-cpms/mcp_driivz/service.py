@@ -193,9 +193,7 @@ async def _review_with_client(
             )
         )
     if include_recent_sessions and device_id:
-        tasks["recent_sessions"] = asyncio.create_task(
-            _fetch_recent_sessions(client, device_id)
-        )
+        tasks["recent_sessions"] = asyncio.create_task(_fetch_recent_sessions(client, device_id))
 
     segments: dict[str, Any] = {
         "profile": profile.to_segment(),

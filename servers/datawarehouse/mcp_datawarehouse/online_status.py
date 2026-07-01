@@ -18,6 +18,7 @@ from typing import Any, Protocol
 from mcp_datawarehouse.heartbeat_gap import analyze_heartbeat_gaps, offline_period_to_dict
 from mcp_datawarehouse.models import OCPPEvent, QueryResult
 from mcp_datawarehouse.settings import DatawarehouseSettings
+from mcp_datawarehouse.sql import compose_query_with_trusted_fragments
 from mcp_datawarehouse.timestamp_utils import coerce_datetime
 
 ONLINE_STATUS_WINDOW_EVENTS_QUERY = "charger_ocpp_operations_v.online_status.window_events"
@@ -35,8 +36,7 @@ class QueryClient(Protocol):
         parameters: list[Any] | None = None,
         *,
         source_query: str,
-    ) -> QueryResult:
-        ...
+    ) -> QueryResult: ...
 
 
 class DeviceOnlineStatusQuery:
@@ -95,7 +95,9 @@ class DeviceOnlineStatusQuery:
         )
 
         total_offline_seconds = sum(period.duration_seconds for period in offline_periods)
-        heartbeat_count = sum(1 for event in window_events if event.ocpp_message_type == "Heartbeat")
+        heartbeat_count = sum(
+            1 for event in window_events if event.ocpp_message_type == "Heartbeat"
+        )
         logger.info(
             "Completed online status analysis: sso_id=%s event_count_in_window=%s "
             "heartbeat_count_in_window=%s offline_period_count=%s",
@@ -152,18 +154,22 @@ class DeviceOnlineStatusQuery:
             time_from,
             time_to,
         )
-        query = f"""
+        query = compose_query_with_trusted_fragments(
+            """
         SELECT
             sso_id,
             operation_timestamp,
             ocpp_message_type,
             ocpp_request_body
-        FROM {table}
+        FROM """,
+            table,
+            """
         WHERE sso_id = ?
           AND operation_timestamp >= ?
           AND operation_timestamp <= ?
         ORDER BY operation_timestamp ASC
-        """
+        """,
+        )
         result = await self.client.execute(
             query,
             [sso_id, time_from, time_to],

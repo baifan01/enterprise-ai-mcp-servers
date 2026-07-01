@@ -26,7 +26,10 @@ class FakeSearchClient:
                                 "title": "Child UI",
                                 "type": "page",
                                 "space": {"id": "space-1"},
-                                "_links": {"base": "https://example.atlassian.net/wiki", "webui": "/spaces/A/pages/2/Child"},
+                                "_links": {
+                                    "base": "https://example.atlassian.net/wiki",
+                                    "webui": "/spaces/A/pages/2/Child",
+                                },
                             },
                             "excerpt": "UI child",
                             "lastModified": "2024-01-01T00:00:00.000Z",
@@ -44,8 +47,13 @@ class FakeSearchClient:
                     "id": "123",
                     "spaceId": "space-1",
                     "title": "Parent UI",
-                    "body": {"storage": {"representation": "storage", "value": "<p>Parent body</p>"}},
-                    "_links": {"base": "https://example.atlassian.net/wiki", "webui": "/spaces/A/pages/123/Parent"},
+                    "body": {
+                        "storage": {"representation": "storage", "value": "<p>Parent body</p>"}
+                    },
+                    "_links": {
+                        "base": "https://example.atlassian.net/wiki",
+                        "webui": "/spaces/A/pages/123/Parent",
+                    },
                 },
                 source_api or path,
             )

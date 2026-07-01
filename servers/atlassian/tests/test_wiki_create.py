@@ -59,7 +59,10 @@ class FakeCreateClient:
                     "status": "current",
                     "title": body["title"],
                     "version": {"number": 1},
-                    "_links": {"base": "https://example.atlassian.net/wiki", "webui": "/spaces/A/pages/456/New"},
+                    "_links": {
+                        "base": "https://example.atlassian.net/wiki",
+                        "webui": "/spaces/A/pages/456/New",
+                    },
                 },
                 source_api or path,
             )
@@ -88,7 +91,10 @@ class FakeCreateClient:
                     "status": "current",
                     "title": body["title"],
                     "version": {"number": body["version"]["number"]},
-                    "_links": {"base": "https://example.atlassian.net/wiki", "webui": "/spaces/A/pages/123/Updated"},
+                    "_links": {
+                        "base": "https://example.atlassian.net/wiki",
+                        "webui": "/spaces/A/pages/123/Updated",
+                    },
                 },
                 source_api or path,
             )
@@ -116,7 +122,9 @@ class WikiCreateTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["id"], "456")
         self.assertEqual(result["parent_type"], "page")
         self.assertEqual(result["labels"], [AI_GENERATED_LABEL, AGENT_FRIENDLY_LABEL])
-        self.assertEqual([item["name"] for item in label_body], [AI_GENERATED_LABEL, AGENT_FRIENDLY_LABEL])
+        self.assertEqual(
+            [item["name"] for item in label_body], [AI_GENERATED_LABEL, AGENT_FRIENDLY_LABEL]
+        )
 
     async def test_folder_parent_falls_back_after_page_lookup(self) -> None:
         client = FakeCreateClient()

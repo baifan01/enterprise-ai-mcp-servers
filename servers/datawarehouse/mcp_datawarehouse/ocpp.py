@@ -14,6 +14,7 @@ from typing import Any, Protocol
 
 from mcp_datawarehouse.models import OCPPEvent, QueryResult
 from mcp_datawarehouse.settings import DatawarehouseSettings
+from mcp_datawarehouse.sql import compose_query_with_trusted_fragments
 from mcp_datawarehouse.timestamp_utils import coerce_datetime
 
 OCPP_SOURCE_QUERY = "charger_ocpp_operations_v"
@@ -30,8 +31,7 @@ class QueryClient(Protocol):
         parameters: list[Any] | None = None,
         *,
         source_query: str,
-    ) -> QueryResult:
-        ...
+    ) -> QueryResult: ...
 
 
 class OCPPFetcher:
@@ -54,20 +54,26 @@ class OCPPFetcher:
         table = self.client.settings.table("charger_ocpp_operations_v")
 
         heartbeat_clause = "" if include_heartbeats else "AND ocpp_message_type != 'Heartbeat'"
-        query = f"""
+        query = compose_query_with_trusted_fragments(
+            """
         SELECT
             REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) AS sso_id,
             operation_timestamp,
             ocpp_message_type,
             ocpp_request_body,
             ocpp_response_body
-        FROM {table}
+        FROM """,
+            table,
+            """
         WHERE REGEXP_EXTRACT(sso_id, '^([^_]+)', 1) = ?
           AND operation_timestamp >= ?
           AND operation_timestamp <= ?
-          {heartbeat_clause}
+          """,
+            heartbeat_clause,
+            """
         ORDER BY operation_timestamp ASC
-        """
+        """,
+        )
 
         result = await self.client.execute(
             query,

@@ -10,7 +10,9 @@ from mcp_atlassian.cli import build_parser
 class AtlassianCliTest(unittest.TestCase):
     def test_read_wiki_page_does_not_accept_user_id(self) -> None:
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
-            build_parser().parse_args(["read-wiki-page", "--page-id", "123", "--user-id", "fan.bai@example.com"])
+            build_parser().parse_args(
+                ["read-wiki-page", "--page-id", "123", "--user-id", "fan.bai@example.com"]
+            )
 
     def test_search_wiki_pages_accepts_structured_filters(self) -> None:
         args = build_parser().parse_args(
@@ -32,7 +34,9 @@ class AtlassianCliTest(unittest.TestCase):
 
         self.assertEqual(args.text, ["design", "system"])
         self.assertEqual(args.search_field, "title")
-        self.assertEqual(args.parent_url, "https://example.atlassian.net/wiki/spaces/UM/pages/123/Parent")
+        self.assertEqual(
+            args.parent_url, "https://example.atlassian.net/wiki/spaces/UM/pages/123/Parent"
+        )
         self.assertTrue(args.agent_friendly_only)
         self.assertEqual(args.max_results, 20)
         self.assertFalse(hasattr(args, "user_id"))
@@ -70,7 +74,9 @@ class AtlassianCliTest(unittest.TestCase):
         )
 
         self.assertEqual(args.command, "update-wiki-page")
-        self.assertEqual(args.page_url, "https://example.atlassian.net/wiki/spaces/UM/pages/123/Page")
+        self.assertEqual(
+            args.page_url, "https://example.atlassian.net/wiki/spaces/UM/pages/123/Page"
+        )
         self.assertEqual(args.title, "Updated")
         self.assertEqual(args.body_markdown, "# Updated")
         self.assertEqual(args.version_message, "replace content")

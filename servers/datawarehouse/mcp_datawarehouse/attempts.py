@@ -14,6 +14,7 @@ from typing import Any, Protocol
 
 from mcp_datawarehouse.models import ChargingAttemptRecord, MergedChargingAttempt, QueryResult
 from mcp_datawarehouse.settings import DatawarehouseSettings
+from mcp_datawarehouse.sql import compose_query_with_trusted_fragments
 from mcp_datawarehouse.timestamp_utils import coerce_datetime
 
 ATTEMPTS_SOURCE_QUERY = "kpi_charging_attempts_enriched_v"
@@ -29,8 +30,7 @@ class QueryClient(Protocol):
         parameters: list[Any] | None = None,
         *,
         source_query: str,
-    ) -> QueryResult:
-        ...
+    ) -> QueryResult: ...
 
 
 class AttemptFinder:
@@ -44,13 +44,17 @@ class AttemptFinder:
 
     async def lookup_sso_by_evse(self, evse_id: str) -> str | None:
         table = self.client.settings.table("charger_location_charger_v")
-        query = f"""
+        query = compose_query_with_trusted_fragments(
+            """
         SELECT sso_id
-        FROM {table}
+        FROM """,
+            table,
+            """
         WHERE evse_id LIKE ?
           AND (sso_valid_to IS NULL OR sso_valid_to > CURRENT_DATE())
         LIMIT 1
-        """
+        """,
+        )
         result = await self.client.execute(
             query,
             [f"%{evse_id}%"],
@@ -197,7 +201,8 @@ class ChargingAttemptsQuery:
         time_to: dt.datetime,
     ) -> list[ChargingAttemptRecord]:
         table = self.client.settings.table("kpi_charging_attempts_enriched_v")
-        query = f"""
+        query = compose_query_with_trusted_fragments(
+            """
         SELECT
             source_device_id AS sso_id,
             ocpi_connector_id AS connector_id,
@@ -216,7 +221,9 @@ class ChargingAttemptsQuery:
             invalid_session_reasons_from_source,
             has_connector_lock_failure,
             attempt_with_alfen_error_304_timeout
-        FROM {table}
+        FROM """,
+            table,
+            """
         WHERE source_device_id = ?
           AND (
             charging_attempt_start BETWEEN ? AND ?
@@ -224,7 +231,8 @@ class ChargingAttemptsQuery:
             OR (charging_attempt_start <= ? AND charging_attempt_end >= ?)
           )
         ORDER BY ocpi_connector_id, charging_attempt_start
-        """
+        """,
+        )
         result = await self.client.execute(
             query,
             [sso_id, time_from, time_to, time_from, time_to, time_from, time_to],
@@ -266,9 +274,7 @@ class ChargingAttemptsQuery:
             "seconds_in_charging": raw.get("seconds_in_charging"),
             "invalid_session_reasons_from_source": raw.get("invalid_session_reasons_from_source"),
             "has_connector_lock_failure": raw.get("has_connector_lock_failure"),
-            "attempt_with_alfen_error_304_timeout": raw.get(
-                "attempt_with_alfen_error_304_timeout"
-            ),
+            "attempt_with_alfen_error_304_timeout": raw.get("attempt_with_alfen_error_304_timeout"),
         }
 
     def _merged_to_dict(self, attempt: MergedChargingAttempt) -> dict[str, Any]:

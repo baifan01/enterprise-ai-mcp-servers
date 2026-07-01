@@ -62,9 +62,7 @@ def analyze_heartbeat_gaps(
                             sso_id=event.sso_id,
                             offline_start=clipped_start,
                             offline_restore=clipped_restore,
-                            duration_seconds=int(
-                                (clipped_restore - clipped_start).total_seconds()
-                            ),
+                            duration_seconds=int((clipped_restore - clipped_start).total_seconds()),
                             reason=OFFLINE_GAP_REASON,
                             evidence={
                                 "raw_offline_start": previous_event.operation_timestamp.isoformat(),

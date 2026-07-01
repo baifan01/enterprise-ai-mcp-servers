@@ -5,8 +5,8 @@ description = "Atlassian Jira and Confluence core service for ubi-personal-assis
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "httpx>=0.28.1",
-    "pydantic-settings>=2.14.1",
+    "httpx>=0.28.1,<1",
+    "pydantic-settings>=2.14.2,<3",
 ]
 
 
@@ -15,3 +15,23 @@ atlassian = "mcp_atlassian.cli:main"
 
 [tool.uv]
 package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.4,<2",
+    "pip-audit>=2.10.1,<3",
+    "pytest>=9.1.1,<10",
+    "pytest-cov>=7.1.0,<8",
+    "ruff>=0.15.20,<1",
+]

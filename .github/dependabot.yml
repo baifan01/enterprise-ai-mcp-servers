@@ -1,0 +1,53 @@
+version: 2
+
+updates:
+  - package-ecosystem: "uv"
+    directory: "/servers/atlassian"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+      - "atlassian"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "uv"
+    directory: "/servers/datawarehouse"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+      - "datawarehouse"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"
+
+  - package-ecosystem: "uv"
+    directory: "/servers/driivz-cpms"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "python"
+      - "driivz-cpms"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major"

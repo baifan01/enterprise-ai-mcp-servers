@@ -26,7 +26,32 @@ Before creating a commit, the agent should:
 4. Run focused tests for behavior changes.
 5. Run broader tests when package boundaries, storage schema, runtime behavior,
    channel flow, or audit behavior changed.
-6. Note any tests that were not run and why.
+6. Run the local quality and security gate for each affected server:
+
+   ```bash
+   cd servers/atlassian
+   uv run ruff check .
+   uv run ruff format --check .
+   uv run pytest
+   uv run bandit -r mcp_atlassian -c pyproject.toml
+   uv run pip-audit
+
+   cd ../datawarehouse
+   uv run ruff check .
+   uv run ruff format --check .
+   uv run pytest
+   uv run bandit -r mcp_datawarehouse -c pyproject.toml
+   uv run pip-audit
+
+   cd ../driivz-cpms
+   uv run ruff check .
+   uv run ruff format --check .
+   uv run pytest
+   uv run bandit -r mcp_driivz -c pyproject.toml
+   uv run pip-audit
+   ```
+
+7. Note any tests or scans that were not run and why.
 
 If the worktree contains unrelated modifications, do not revert them. Commit
 only the files that belong to the requested change.
@@ -142,4 +167,3 @@ Do not create a commit if:
 - Required design choices are unclear and the repository instructions say to
   stop and ask.
 - The only available commit would mix unrelated user changes with agent changes.
-

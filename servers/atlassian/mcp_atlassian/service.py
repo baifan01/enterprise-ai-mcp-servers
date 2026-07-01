@@ -69,7 +69,7 @@ async def read_wiki_page(
         page_id,
         bool(page_url),
         include_footer_comments,
-           )
+    )
     query = {
         "page_id": page_id,
         "page_url": page_url,
@@ -91,7 +91,9 @@ async def read_wiki_page(
             kind="read_wiki_page",
         )
     result["errors"] = []
-    logger.info("Completed Atlassian service request: kind=read_wiki_page page_id=%s", result.get("id"))
+    logger.info(
+        "Completed Atlassian service request: kind=read_wiki_page page_id=%s", result.get("id")
+    )
     return result
 
 
@@ -155,7 +157,7 @@ async def search_wiki_pages(
         agent_friendly_only,
         match,
         max_results,
-           )
+    )
     query = {
         "text": text,
         "search_field": search_field,
@@ -238,7 +240,7 @@ async def create_wiki_child_page(
         bool(parent_url),
         title,
         mark_agent_friendly,
-           )
+    )
     query = {
         "parent_url": parent_url,
         "title": title,
@@ -321,7 +323,7 @@ async def update_wiki_page(
         bool(page_url),
         title is not None,
         bool(version_message),
-           )
+    )
     query = {
         "page_url": page_url,
         "title": title,
@@ -356,7 +358,11 @@ def _failed_result(
     errors: list[AtlassianServiceError],
     kind: str,
 ) -> dict[str, Any]:
-    log_level = logging.INFO if all(error.type == "invalid_request" for error in errors) else logging.WARNING
+    log_level = (
+        logging.INFO
+        if all(error.type == "invalid_request" for error in errors)
+        else logging.WARNING
+    )
     logger.log(
         log_level,
         "Atlassian service request failed",

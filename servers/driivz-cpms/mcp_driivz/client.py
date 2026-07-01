@@ -199,7 +199,9 @@ def result_to_error(
     error_type: str | None = None,
     message: str | None = None,
 ) -> DriivzServiceError:
-    inferred_type = error_type or ("auth_failed" if _is_invalid_ticket(result.body) else "rest_error")
+    inferred_type = error_type or (
+        "auth_failed" if _is_invalid_ticket(result.body) else "rest_error"
+    )
     return DriivzServiceError(
         type=inferred_type,
         message=message or f"Driivz REST request failed: {_safe_error_message(result.body)}",
