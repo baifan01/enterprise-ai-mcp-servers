@@ -31,7 +31,6 @@
       "mode": "read",
       "display_name": "Databricks Read",
       "summary": "Read-only Databricks data warehouse tools.",
-      "requires_user_id": true,
       "subcommands": [
         {
           "name": "query-charging-attempts",

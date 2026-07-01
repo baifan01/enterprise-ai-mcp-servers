@@ -17,7 +17,6 @@ Use when the user provides a Confluence page id or URL and the agent needs the f
 | `page_id` | Optional numeric Confluence page id. Exactly one of `page_id` or `page_url` must be provided. |
 | `page_url` | Optional browser URL copied from Confluence. Exactly one of `page_id` or `page_url` must be provided. |
 | `include_footer_comments` | If true, also read root footer comments. Defaults to false. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 
 ## Examples
 

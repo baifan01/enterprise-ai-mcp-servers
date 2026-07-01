@@ -16,7 +16,6 @@ Use when the user provides a company device ID or Driivz EVSE ID and needs CPMS 
 | --- | --- |
 | `key` | Required company device ID or Driivz EVSE ID. |
 | `key_type` | One of: `auto`, `device_id`, `evse_id`. Defaults to `auto`; auto treats keys containing `*` as EVSE IDs and other values as company device IDs. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 | `include_recent_sessions` | If true, also fetch recent EV transaction context for the resolved charger identity. Defaults to true. |
 
 ## Examples

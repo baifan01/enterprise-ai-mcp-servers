@@ -28,7 +28,6 @@ async def query_charging_attempts(
     time_to: dt.datetime | str,
     sso_id: str | None = None,
     evse_id: str | None = None,
-    user_id: str | None = None,
 ) -> dict[str, Any]:
     """Return charging attempts and adjacent user-level merges for a device window.
 
@@ -55,9 +54,6 @@ async def query_charging_attempts(
         evse_id:
             Optional external EVSE ID. Provide either evse_id or sso_id; the
             query resolves it to an internal SSO ID when needed.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
 
     Examples:
         databricks-read.sh query-charging-attempts --sso-id suby1100012048 --time-from 2026-06-03T19:00:00Z --time-to 2026-06-03T20:00:00Z
@@ -74,22 +70,14 @@ async def query_charging_attempts(
 
     logger.info(
         "Starting data warehouse service request: kind=attempts sso_id=%s evse_id=%s "
-        "time_from=%s time_to=%s has_user_id=%s",
+        "time_from=%s time_to=%s",
         sso_id,
         evse_id,
         time_from,
         time_to,
-        bool(user_id),
-    )
-    user_id_error = _validate_user_id(user_id)
-    if user_id_error is not None:
-        return _failed_result(
-            query={"sso_id": sso_id, "evse_id": evse_id, "time_from": time_from, "time_to": time_to},
-            errors=[user_id_error],
-            kind="attempts",
-        )
+           )
     try:
-        async with DatabricksClient(DatawarehouseSettings(user_id=user_id)) as client:
+        async with DatabricksClient(DatawarehouseSettings()) as client:
             result = await ChargingAttemptsQuery(client).query(
                 sso_id=sso_id,
                 evse_id=evse_id,
@@ -130,7 +118,6 @@ async def query_ocpp_sequence(
     sso_id: str,
     time_from: dt.datetime | str,
     time_to: dt.datetime | str,
-    user_id: str | None = None,
     include_heartbeats: bool = False,
     include_raw_payload: bool = False,
     max_payload_chars: int = 1200,
@@ -158,9 +145,6 @@ async def query_ocpp_sequence(
         time_to:
             Required inclusive end timestamp. Accepts ISO-8601 strings or
             datetime values.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
         include_heartbeats:
             If true, include Heartbeat events in the sequence. Defaults to
             false to keep output focused.
@@ -186,30 +170,15 @@ async def query_ocpp_sequence(
 
     logger.info(
         "Starting data warehouse service request: kind=ocpp sso_id=%s time_from=%s "
-        "time_to=%s include_heartbeats=%s include_raw_payload=%s has_user_id=%s",
+        "time_to=%s include_heartbeats=%s include_raw_payload=%s",
         sso_id,
         time_from,
         time_to,
         include_heartbeats,
         include_raw_payload,
-        bool(user_id),
-    )
-    user_id_error = _validate_user_id(user_id)
-    if user_id_error is not None:
-        return _failed_result(
-            query={
-                "sso_id": sso_id,
-                "time_from": time_from,
-                "time_to": time_to,
-                "include_heartbeats": include_heartbeats,
-                "include_raw_payload": include_raw_payload,
-                "max_payload_chars": max_payload_chars,
-            },
-            errors=[user_id_error],
-            kind="ocpp",
-        )
+           )
     try:
-        async with DatabricksClient(DatawarehouseSettings(user_id=user_id)) as client:
+        async with DatabricksClient(DatawarehouseSettings()) as client:
             result = await OCPPSequenceQuery(client).query(
                 sso_id=sso_id,
                 time_from=time_from,
@@ -264,7 +233,6 @@ async def query_device_online_status(
     sso_id: str,
     time_from: dt.datetime | str,
     time_to: dt.datetime | str,
-    user_id: str | None = None,
     heartbeat_interval_seconds: int = 900,
     missed_heartbeat_tolerance: int = 1,
     recent_end_grace_seconds: int = 1800,
@@ -291,9 +259,6 @@ async def query_device_online_status(
         time_to:
             Required inclusive end timestamp. Accepts ISO-8601 strings or
             datetime values.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
         heartbeat_interval_seconds:
             Expected Heartbeat interval in seconds. Defaults to 900.
         missed_heartbeat_tolerance:
@@ -319,15 +284,14 @@ async def query_device_online_status(
     logger.info(
         "Starting data warehouse service request: kind=online_status sso_id=%s "
         "time_from=%s time_to=%s heartbeat_interval_seconds=%s "
-        "missed_heartbeat_tolerance=%s recent_end_grace_seconds=%s has_user_id=%s",
+        "missed_heartbeat_tolerance=%s recent_end_grace_seconds=%s",
         sso_id,
         time_from,
         time_to,
         heartbeat_interval_seconds,
         missed_heartbeat_tolerance,
         recent_end_grace_seconds,
-        bool(user_id),
-    )
+           )
     query = {
         "sso_id": sso_id,
         "time_from": time_from,
@@ -336,11 +300,8 @@ async def query_device_online_status(
         "missed_heartbeat_tolerance": missed_heartbeat_tolerance,
         "recent_end_grace_seconds": recent_end_grace_seconds,
     }
-    user_id_error = _validate_user_id(user_id)
-    if user_id_error is not None:
-        return _failed_result(query=query, errors=[user_id_error], kind="online_status")
     try:
-        async with DatabricksClient(DatawarehouseSettings(user_id=user_id)) as client:
+        async with DatabricksClient(DatawarehouseSettings()) as client:
             result = await DeviceOnlineStatusQuery(client).query(
                 sso_id=sso_id,
                 time_from=time_from,
@@ -440,13 +401,3 @@ def _safe_json_value(value: Any) -> Any:
         return value.isoformat()
     return value
 
-
-def _validate_user_id(user_id: str | None) -> DatawarehouseServiceError | None:
-    if user_id is not None and user_id.strip():
-        return None
-    return DatawarehouseServiceError(
-        type="invalid_request",
-        message="user_id is required for personal secrets lookup",
-        segment="input",
-        retryable=False,
-    )

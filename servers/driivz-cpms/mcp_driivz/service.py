@@ -23,7 +23,6 @@ async def review_site_runtime_by_key(
     key: str,
     *,
     key_type: KeyType = "auto",
-    user_id: str | None = None,
     include_recent_sessions: bool = True,
 ) -> dict[str, Any]:
     """Return Driivz site runtime context by company device ID or EVSE ID.
@@ -45,9 +44,6 @@ async def review_site_runtime_by_key(
         key_type:
             One of: auto, device_id, evse_id. Defaults to auto; auto treats keys
             containing "*" as EVSE IDs and other values as company device IDs.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
         include_recent_sessions:
             If true, also fetch recent EV transaction context for the resolved
             charger identity. Defaults to true.
@@ -88,7 +84,7 @@ async def review_site_runtime_by_key(
         return _base_result(key=key, key_type=key_type, resolved=False, errors=[error])
 
     try:
-        async with DriivzClient(DriivzSettings(user_id=user_id)) as client:
+        async with DriivzClient(DriivzSettings()) as client:
             return await _review_with_client(
                 client,
                 normalized_key,

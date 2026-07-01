@@ -20,7 +20,6 @@ Use when the user wants to find wiki pages by keywords, optionally under a paren
 | `agent_friendly_only` | If true, only search pages labeled `ubitricity-agent-friendly`. |
 | `match` | One of: `all`, `any`. Defaults to `all`. |
 | `max_results` | Maximum number of results. Capped at 50. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 
 ## Examples
 

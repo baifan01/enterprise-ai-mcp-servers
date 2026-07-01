@@ -220,17 +220,10 @@ source = { virtual = "." }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic-settings" },
-    { name = "ubi-mcp-common" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pydantic-settings", specifier = ">=2.14.1" },
-    { name = "ubi-mcp-common", directory = "../common" },
 ]
-
-[[package]]
-name = "ubi-mcp-common"
-version = "0.1.0"
-source = { directory = "../common" }

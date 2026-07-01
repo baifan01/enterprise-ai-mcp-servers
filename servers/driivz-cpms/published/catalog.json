@@ -31,7 +31,6 @@
       "mode": "read",
       "display_name": "Driivz Read",
       "summary": "Read-only Driivz CPMS runtime tools.",
-      "requires_user_id": true,
       "subcommands": [
         {
           "name": "review-site-runtime-by-key",

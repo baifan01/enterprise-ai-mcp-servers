@@ -17,7 +17,6 @@ Use when the user needs chronological OCPP operation evidence for a device in a 
 | `sso_id` | Required internal device SSO ID. |
 | `time_from` | Required inclusive start timestamp. Accepts ISO-8601 strings or datetime values. |
 | `time_to` | Required inclusive end timestamp. Accepts ISO-8601 strings or datetime values. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 | `include_heartbeats` | If true, include Heartbeat events in the sequence. Defaults to false to keep output focused. |
 | `include_raw_payload` | If true, include bounded raw request and response payload snippets. Defaults to false. |
 | `max_payload_chars` | Maximum raw payload characters per request or response when raw payloads are included. Defaults to 1200. |

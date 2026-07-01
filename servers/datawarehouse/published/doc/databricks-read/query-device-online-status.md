@@ -17,7 +17,6 @@ Use when the user asks whether a charge point was online or offline in a specifi
 | `sso_id` | Required internal device SSO ID. |
 | `time_from` | Required inclusive start timestamp. Accepts ISO-8601 strings or datetime values. |
 | `time_to` | Required inclusive end timestamp. Accepts ISO-8601 strings or datetime values. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 | `heartbeat_interval_seconds` | Expected Heartbeat interval in seconds. Defaults to 900. |
 | `missed_heartbeat_tolerance` | Number of missed Heartbeats tolerated before flagging an offline gap. Defaults to 1. |
 | `recent_end_grace_seconds` | Skip querying the next event when `time_to` is this close to now. Defaults to 1800. |

@@ -25,7 +25,6 @@ def build_parser() -> argparse.ArgumentParser:
         default="auto",
         help="How to interpret the key. Auto treats values containing '*' as EVSE IDs.",
     )
-    review_key.add_argument("--user-id", help="Runtime user id for personal secrets lookup.")
     review_key.add_argument(
         "--no-recent-sessions",
         action="store_true",
@@ -41,7 +40,6 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
         return await review_site_runtime_by_key(
             args.key,
             key_type=args.key_type,
-            user_id=args.user_id,
             include_recent_sessions=not args.no_recent_sessions,
         )
     raise ValueError(f"Unsupported command: {args.command}")

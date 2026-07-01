@@ -18,7 +18,6 @@ Use when the user explicitly wants to create a new Confluence page under a known
 | `title` | Required page title. |
 | `body_markdown` | Required Markdown body using the supported subset. |
 | `mark_agent_friendly` | If true, also add the `ubitricity-agent-friendly` label. Defaults to false. The `ubitricity-ai-generated` label is always attempted. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 
 ## Examples
 

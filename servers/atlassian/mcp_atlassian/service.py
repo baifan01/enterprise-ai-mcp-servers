@@ -24,7 +24,6 @@ async def read_wiki_page(
     page_id: str | None = None,
     page_url: str | None = None,
     include_footer_comments: bool = False,
-    user_id: str | None = None,
 ) -> dict[str, Any]:
     """Read a Confluence wiki page by id or browser URL.
 
@@ -48,9 +47,6 @@ async def read_wiki_page(
             or page_url must be provided.
         include_footer_comments:
             If true, also read root footer comments. Defaults to false.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
 
     Examples:
         atlassian-read.sh read-wiki-page --page-id 5781061778
@@ -69,19 +65,18 @@ async def read_wiki_page(
 
     logger.info(
         "Starting Atlassian service request: kind=read_wiki_page page_id=%s "
-        "has_page_url=%s include_footer_comments=%s has_user_id=%s",
+        "has_page_url=%s include_footer_comments=%s",
         page_id,
         bool(page_url),
         include_footer_comments,
-        bool(user_id),
-    )
+           )
     query = {
         "page_id": page_id,
         "page_url": page_url,
         "include_footer_comments": include_footer_comments,
     }
     try:
-        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings()) as client:
             result = await WikiService(client).read_page(
                 page_id=page_id,
                 page_url=page_url,
@@ -108,7 +103,6 @@ async def search_wiki_pages(
     agent_friendly_only: bool = False,
     match: str = "all",
     max_results: int = 10,
-    user_id: str | None = None,
 ) -> dict[str, Any]:
     """Search Confluence wiki pages with structured parameters.
 
@@ -137,9 +131,6 @@ async def search_wiki_pages(
             One of: all, any. Defaults to all.
         max_results:
             Maximum number of results. Capped at 50.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
 
     Examples:
         atlassian-read.sh search-wiki-pages "design system" --search-field title
@@ -158,14 +149,13 @@ async def search_wiki_pages(
     logger.info(
         "Starting Atlassian service request: kind=search_wiki_pages search_field=%s "
         "has_parent_url=%s agent_friendly_only=%s match=%s "
-        "max_results=%s has_user_id=%s",
+        "max_results=%s",
         search_field,
         bool(parent_url),
         agent_friendly_only,
         match,
         max_results,
-        bool(user_id),
-    )
+           )
     query = {
         "text": text,
         "search_field": search_field,
@@ -175,7 +165,7 @@ async def search_wiki_pages(
         "max_results": max_results,
     }
     try:
-        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings()) as client:
             result = await WikiService(client).search_pages(
                 text=text,
                 search_field=search_field,
@@ -205,7 +195,6 @@ async def create_wiki_child_page(
     title: str,
     body_markdown: str,
     mark_agent_friendly: bool = False,
-    user_id: str | None = None,
 ) -> dict[str, Any]:
     """Create a Confluence child page from supported Markdown.
 
@@ -229,9 +218,6 @@ async def create_wiki_child_page(
         mark_agent_friendly:
             If true, also add the ubitricity-agent-friendly label. Defaults to
             false. The ubitricity-ai-generated label is always attempted.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
 
     Examples:
         atlassian-write.sh create-wiki-child-page --parent-url "https://example.atlassian.net/wiki/spaces/UM/folder/123456789" --title "Agent Runbook" --body-markdown "# Runbook" --mark-agent-friendly
@@ -248,19 +234,18 @@ async def create_wiki_child_page(
 
     logger.info(
         "Starting Atlassian service request: kind=create_wiki_child_page "
-        "has_parent_url=%s title=%s mark_agent_friendly=%s has_user_id=%s",
+        "has_parent_url=%s title=%s mark_agent_friendly=%s",
         bool(parent_url),
         title,
         mark_agent_friendly,
-        bool(user_id),
-    )
+           )
     query = {
         "parent_url": parent_url,
         "title": title,
         "mark_agent_friendly": mark_agent_friendly,
     }
     try:
-        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings()) as client:
             result = await WikiService(client).create_child_page(
                 parent_url=parent_url,
                 title=title,
@@ -288,7 +273,6 @@ async def update_wiki_page(
     body_markdown: str,
     title: str | None = None,
     version_message: str | None = None,
-    user_id: str | None = None,
 ) -> dict[str, Any]:
     """Update an existing Confluence wiki page from supported Markdown.
 
@@ -314,9 +298,6 @@ async def update_wiki_page(
             preserved.
         version_message:
             Optional Confluence version message.
-        user_id:
-            Runtime user id for personal secrets lookup. Wrappers bind this; the
-            agent must not pass it directly.
 
     Examples:
         atlassian-write.sh update-wiki-page --page-url "https://example.atlassian.net/wiki/spaces/UM/pages/123456789/Page" --body-markdown "# Updated"
@@ -336,19 +317,18 @@ async def update_wiki_page(
 
     logger.info(
         "Starting Atlassian service request: kind=update_wiki_page has_page_url=%s "
-        "has_title=%s has_version_message=%s has_user_id=%s",
+        "has_title=%s has_version_message=%s",
         bool(page_url),
         title is not None,
         bool(version_message),
-        bool(user_id),
-    )
+           )
     query = {
         "page_url": page_url,
         "title": title,
         "has_version_message": bool(version_message),
     }
     try:
-        async with AtlassianClient(AtlassianSettings(user_id=user_id)) as client:
+        async with AtlassianClient(AtlassianSettings()) as client:
             result = await WikiService(client).update_page(
                 page_url=page_url,
                 body_markdown=body_markdown,

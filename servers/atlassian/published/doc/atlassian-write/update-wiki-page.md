@@ -18,7 +18,6 @@ Use when the user explicitly wants to replace the content of an existing Conflue
 | `body_markdown` | Required Markdown body using the supported subset. It replaces the previous page body. |
 | `title` | Optional replacement title. If omitted, the current page title is preserved. |
 | `version_message` | Optional Confluence version message. |
-| `user_id` | Runtime user id for personal secrets lookup. Wrappers bind this; the agent must not pass it directly. |
 
 ## Examples
 

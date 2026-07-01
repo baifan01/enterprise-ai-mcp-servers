@@ -525,25 +525,18 @@ wheels = [
 ]
 
 [[package]]
-name = "ubi-mcp-common"
-version = "0.1.0"
-source = { directory = "../common" }
-
-[[package]]
 name = "ubi-mcp-datawarehouse"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "databricks-sql-connector" },
     { name = "pydantic-settings" },
-    { name = "ubi-mcp-common" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "databricks-sql-connector", specifier = "==4.2.6" },
     { name = "pydantic-settings", specifier = ">=2.14.1" },
-    { name = "ubi-mcp-common", directory = "../common" },
 ]
 
 [[package]]

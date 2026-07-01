@@ -1,8 +1,0 @@
-[project]
-name = "ubi-mcp-common"
-version = "0.1.0"
-description = "Shared local tool support for ubi MCP servers."
-requires-python = ">=3.12"
-
-[tool.uv]
-package = true

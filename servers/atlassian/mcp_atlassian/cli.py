@@ -29,7 +29,6 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Read root footer comments.",
     )
-    read.add_argument("--user-id", required=True, help="Runtime user id for personal secrets lookup.")
     read.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
 
     search = subparsers.add_parser("search-wiki-pages", help="Search Confluence wiki pages.")
@@ -39,7 +38,6 @@ def build_parser() -> argparse.ArgumentParser:
     search.add_argument("--agent-friendly-only", action="store_true")
     search.add_argument("--match", default="all", choices=["all", "any"])
     search.add_argument("--max-results", type=int, default=10)
-    search.add_argument("--user-id", required=True, help="Runtime user id for personal secrets lookup.")
     search.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
 
     create = subparsers.add_parser(
@@ -50,7 +48,6 @@ def build_parser() -> argparse.ArgumentParser:
     create.add_argument("--title", required=True, help="New page title.")
     create.add_argument("--body-markdown", required=True, help="Markdown body content.")
     create.add_argument("--mark-agent-friendly", action="store_true")
-    create.add_argument("--user-id", required=True, help="Runtime user id for personal secrets lookup.")
     create.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
 
     update = subparsers.add_parser(
@@ -61,7 +58,6 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("--body-markdown", required=True, help="Markdown body content.")
     update.add_argument("--title", help="Optional replacement page title.")
     update.add_argument("--version-message", help="Optional Confluence version message.")
-    update.add_argument("--user-id", required=True, help="Runtime user id for personal secrets lookup.")
     update.add_argument("--pretty", action="store_true", help="Pretty-print JSON output.")
 
     return parser
@@ -73,7 +69,6 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             page_id=args.page_id,
             page_url=args.page_url,
             include_footer_comments=args.include_footer_comments,
-            user_id=args.user_id,
         )
     if args.command == "search-wiki-pages":
         return await search_wiki_pages(
@@ -83,7 +78,6 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             agent_friendly_only=args.agent_friendly_only,
             match=args.match,
             max_results=args.max_results,
-            user_id=args.user_id,
         )
     if args.command == "create-wiki-child-page":
         return await create_wiki_child_page(
@@ -91,7 +85,6 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             title=args.title,
             body_markdown=args.body_markdown,
             mark_agent_friendly=args.mark_agent_friendly,
-            user_id=args.user_id,
         )
     if args.command == "update-wiki-page":
         return await update_wiki_page(
@@ -99,7 +92,6 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             body_markdown=args.body_markdown,
             title=args.title,
             version_message=args.version_message,
-            user_id=args.user_id,
         )
     raise ValueError(f"Unsupported command: {args.command}")
 

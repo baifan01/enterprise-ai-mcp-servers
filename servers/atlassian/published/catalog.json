@@ -31,7 +31,6 @@
       "mode": "read",
       "display_name": "Atlassian Read",
       "summary": "Read-only Atlassian tools.",
-      "requires_user_id": true,
       "subcommands": [
         {
           "name": "read-wiki-page",
@@ -50,7 +49,6 @@
       "mode": "write",
       "display_name": "Atlassian Write",
       "summary": "Write Atlassian Confluence wiki pages.",
-      "requires_user_id": true,
       "subcommands": [
         {
           "name": "create-wiki-child-page",
