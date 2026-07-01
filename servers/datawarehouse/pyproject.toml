@@ -5,7 +5,7 @@ description = "Databricks data warehouse core service for ubi-personal-assistant
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "databricks-sql-connector>=4.2.6,<5",
+    "databricks-sql-connector>=4.3.0,<5",
     "pydantic-settings>=2.14.2,<3",
 ]
 
