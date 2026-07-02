@@ -5,7 +5,8 @@ This repository is a Python async service for channel-based AI assistant orchest
 Before code changes, read and follow:
 
 - `design/CODE_GENERATION_GUIDELINES.md`
-- Relevant design documents under `mcp-design/`
+- For local tool work, `design/LOCAL_TOOL_DEVELOPMENT_GUIDELINES.md`
+- Relevant design documents under `design/`
 
 
 Before creating Git commits, read `design/AGENT_GIT_COMMIT_GUIDELINES.md`

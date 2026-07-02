@@ -1,5 +1,0 @@
-.env
-.env.*
-!.env.example
-responses/
-*.response.json

@@ -144,9 +144,15 @@ def search_wiki_pages(
 
 校验失败时，平台生成器或发布流程应失败，不生成新的 catalog 或 subcommand 文档。
 
+## 发布产物维护方式
+
+当前项目没有专门的自动发布命令或独立发布流水线。local tool 发布产物由 Codex/agent 按本文档规范维护：当公开 tool、CLI subcommand、docstring metadata、Settings 配置项或 wrapper 分组发生变化时，agent 必须同步更新 `servers/<server_id>/published/catalog.json` 和对应 `published/doc/<wrapper_id>/<subcommand>.md`，并按本文档校验字段、参数、示例、安全说明和 catalog 结构。
+
+未来如果引入自动生成器或发布命令，该命令必须以本文档为 source of truth；在此之前，不应假设存在可运行的 publish CLI。
+
 ## 生成器输出
 
-MCP servers 项目的发布生成器根据该规范产生两类环境无关的发布产物：
+MCP servers 项目的发布产物按该规范包含两类环境无关文件：
 
 ```text
 servers/<server_id>/

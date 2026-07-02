@@ -23,3 +23,7 @@ responses/
 
 # Server-local temporary investigations
 servers/**/design/investigation/
+
+# Design investigation scratch work
+design/**/investigation/
+design/**/*-investigation/

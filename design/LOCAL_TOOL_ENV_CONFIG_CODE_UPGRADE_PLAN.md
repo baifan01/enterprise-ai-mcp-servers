@@ -312,14 +312,3 @@ python -m json.tool servers/driivz-cpms/published/catalog.json
 - 确认 catalog `config_keys` 与 Settings env names 一致。
 - 保留或删除 `ubi_mcp_common.personal_secrets` 另行确认。
 
-## 需要确认的问题
-
-以下问题会影响代码生成稳定性，建议实现前确认：
-
-1. 当前是否已有发布生成器命令。如果没有，改 docstring 后如何重新生成 `published/doc` 需要先确定。
-2. `requires_user_id` 是否要在当前三个 catalog 里立即改为 `false`。设计上新工具默认 false，但现有 ubi-ai scanner 目前仍要求该字段存在。
-3. `DRIIVZ_BASE_URL` 当前设计为 system scope 还是 user scope 需要最终确认。已有讨论倾向可以 system scope，但不同环境可能要用户级覆盖。
-4. 是否保留 `.env` 文件读取作为本地开发便利。上线 broker 会注入 env，但本地单独跑 tool 时 `.env` 仍然有价值。
-5. 是否删除 `servers/common/ubi_mcp_common/personal_secrets.py`。直接删除会影响历史测试和潜在旧工具；第一版建议不断引用但不删除。
-6. Datawarehouse 服务里 `_validate_user_id` 当前用于 personal secrets lookup。删除后是否还需要任何业务用户上下文校验，需要确认。
-7. Published docs 里删除 `user_id` 后，ubi-ai 当前旧 materializer 仍会传 `--user-id`。需要和 ubi-ai materializer/broker 切换顺序协调，避免中间版本不兼容。

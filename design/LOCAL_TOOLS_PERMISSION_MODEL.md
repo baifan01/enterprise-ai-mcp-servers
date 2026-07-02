@@ -1,386 +1,163 @@
-# Local Tool 权限模型设计
+# Local Tool 权限与安全模型设计
 
-本文档记录在 GitHub Copilot CLI 组织策略禁用 third-party MCP 后，平台如何用本地脚本工具临时替代 MCP tool 调用，并保留用户级权限控制。
+日期：2026-07-02
 
-## 背景
+本文档是 `ubi-personal-assistant-mcp-servers` 侧 local tool 设计的总体规范。它取代早期“wrapper 直接执行 Python CLI 并通过 `--user-id` 读取 `personal-secrets.env`”的过渡模型。当前权威链路是 `ubi-ai` broker/config 架构：本仓库只发布可被 `ubi-ai` 扫描的 tool catalog、subcommand 文档和真实 Python CLI；用户授权、wrapper materialization、配置存储、secret 解密和审计由 `ubi-ai` 负责。
 
-Shell Copilot policy 当前禁用了 third-party MCP servers。验证结果显示，不仅 remote MCP 被禁，本地 stdio MCP server 也会被 Copilot CLI 拦截。
+## 目标
 
-因此，短期内不能依赖 Copilot CLI 的 MCP 注册机制直接调用：
+- 在 Copilot CLI 无法直接使用 third-party MCP server 时，仍能通过 local tool 访问企业系统。
+- 让 agent 只看到已授权 wrapper 和文档，不看到 token、password、secret 文件路径或真实工具代码细节。
+- 用 read/write wrapper 分组表达风险边界，并保留按 `server_id + wrapper_id + subcommand` 授权的能力。
+- 让每个 MCP server 使用自己的 `.venv` 和 Python module，避免混用 agent runtime venv。
+- 让所有 credential 通过 `ubi-ai` 的 user/system scope config 注入真实 tool 子进程环境。
 
-```text
-Driivz CPMS MCP
-Datawarehouse MCP
-Salesforce MCP
-Atlassian MCP
-```
-
-但 Copilot CLI 仍可以读取授权目录中的文件，并执行本地命令。因此第一阶段采用 local tool wrapper 方案：由 agent 调用用户可见的 wrapper script，wrapper 再调用平台控制的真实 Python tool。
-
-## 设计目标
-
-- 支持在 MCP 被禁的情况下继续访问企业系统。
-- 保留按用户控制 tool 可见性的能力。
-- 不把 secret、token、password 暴露给 agent。
-- 不把所有工具脚本直接放到 shared 目录。
-- 让未来切回 MCP server 时，核心业务代码可以复用。
-
-## 目录结构
-
-运行时数据目录：
+## 当前执行链路
 
 ```text
-ubi-personal-assistant-data/
-  users/
-    <user_id>/
-      workspace/
-      readonly/
-        local-tools/
-          review-site-runtime-by-device.sh
-          review-site-runtime-by-device.readme.md
-          query-ocpp-sequence.sh
-          query-ocpp-sequence.readme.md
-      secrets/
-        personal-secrets.env
+agent
+  -> users/<user_id>/readonly/local-tools/<wrapper_id>.sh
+  -> wrapper 调用 ubi-ai localhost broker
+  -> broker 解码 invocation token 得到 user_id/server_id/wrapper_id
+  -> broker 校验用户状态、catalog、wrapper、subcommand 和授权 grant
+  -> broker 从 DB 合并 user/system scope config
+  -> broker 构造真实 tool 子进程 env
+  -> <server_root>/.venv/bin/python -m <python_module> <subcommand> [business args...]
+  -> tool Settings 只从环境变量构造 typed settings
+  -> tool 输出 stdout/stderr/return_code，由 broker/wrapper 等价转发给 agent
 ```
 
-工具代码目录：
+本仓库不得让生产 local tool 通过 `--user-id`、`UBI_AI_AGENT_ROOT` 或 `users/<user_id>/secrets/personal-secrets.env` 查找 credential。`user_id` 是 `ubi-ai` broker 的授权和配置查询上下文，不是 MCP server 工具侧 credential lookup 输入。
+
+## 仓库职责
+
+本仓库负责：
+
+- 在 `servers/<server_id>/published/catalog.json` 发布 server-level catalog。
+- 在 `servers/<server_id>/published/doc/<wrapper_id>/<subcommand>.md` 发布 agent 可读的 subcommand 说明。
+- 在 `servers/<server_id>/<python_package>/` 实现真实业务 tool、CLI subcommand 和 typed Settings。
+- 在每个 server 自己的 `pyproject.toml` 中维护依赖、测试和质量门配置。
+- 让公开 tool 方法的 docstring metadata 符合 `design/LOCAL_TOOL_DOCSTRING_METADATA.md`。
+
+本仓库不负责：
+
+- 生成用户目录下的 `readonly/local-tools/*.sh` wrapper。
+- 按用户授权裁剪 wrapper/subcommand。
+- 保存或解密 user/system config value。
+- 生成或验证 invocation token。
+- 记录 broker 执行审计。
+- 在 production local tool 路径读取 personal secrets 文件。
+
+这些运行时职责归 `ubi-ai`。
+
+## Published Catalog 规范
+
+每个 server 必须发布：
 
 ```text
-ubi-personal-assistant-mcp-servers/
-  servers/
-    driivz-cpms/
-      .venv/
-      pyproject.toml
-      mcp_driivz/
-        ...
-
-    datawarehouse/
-      ...
-
-    salesforce/
-      ...
+servers/<server_id>/published/catalog.json
+servers/<server_id>/published/doc/<wrapper_id>/<subcommand>.md
 ```
 
-目录含义：
+`server_id` 由 `servers/<server_id>` 目录名决定，不写入 catalog。`published/catalog.json` 必须包含：
 
-- `users/<user_id>/readonly/local-tools/` 放该用户可见、可调用的 wrapper 和同名说明文件。
-- `users/<user_id>/secrets/personal-secrets.env` 放该用户自己的平台级 secret/token，不暴露给 agent。
-- `ubi-personal-assistant-mcp-servers/servers/<tool>/` 放真实工具代码和该工具自己的 `.venv`，不加入 Copilot CLI 的 `--add-dir`。
-- `shared/` 只放公共 instructions、skills、mcp-config 等，不放所有用户都可见的真实工具入口。
+- `schema_version`：第一版固定为 `"1"`。
+- `display_name`：给 admin/UI 展示的 server 名称，不作为 ID。
+- `python_module`：broker 执行的模块，例如 `mcp_atlassian.cli`。
+- `config_keys`：server-level 配置项全集。
+- `wrappers`：按 read/write 风险边界分组的 wrapper 和 subcommand 列表。
 
-## 执行链路
+`config_keys` 是 credential/config 契约。每个 item 必须包含：
 
-```text
-Agent
-  -> 看到 users/<user_id>/readonly/local-tools/
-  -> 根据可见 .sh 判断该用户有哪些 local tools 可用
-  -> 读取目标 wrapper 的同名 .readme.md
-  -> 调用某个 wrapper.sh
-  -> wrapper.sh 使用对应工具目录自己的 .venv/bin/python 调用真实 Python CLI
-  -> Python tool 接收 --user-id
-  -> Python tool 根据 agent root 定位用户 secret
-  -> 读取 users/<user_id>/secrets/personal-secrets.env
-  -> 根据 tool 所属平台读取对应的标准环境变量
-  -> 调用企业系统 API
-  -> 输出结构化 JSON
-  -> Agent 使用 JSON 作为上下文继续推理
-```
+- `key`：真实 tool 子进程读取的环境变量名。
+- `scope`：`user` 或 `system`。
+- `description`：配置说明，不包含真实值或 secret 示例。
+- `secret`：是否加密存储且不回显明文。
+- `required`：缺失时是否阻止真实 tool 执行。
 
-## Wrapper 示例
+`config_keys` 不从 subcommand 参数猜测，也不由单个 docstring 推导；它来自 server Settings/config 定义。catalog 不得包含真实 token、password、默认 secret、用户 id、secret 文件路径或 wrapper materialization token。
 
-以 Driivz CPMS 为例：
+## Wrapper 与权限分组
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-TOOL_ROOT="/path/to/ubi-personal-assistant-mcp-servers/servers/driivz-cpms"
-PYTHON="$TOOL_ROOT/.venv/bin/python"
-export PYTHONPATH="$TOOL_ROOT${PYTHONPATH:+:$PYTHONPATH}"
-
-exec "$PYTHON" -m mcp_driivz.cli \
-  review-site-runtime-by-device \
-  --user-id "andreas.a.weber@shell.com" \
-  "$@"
-```
-
-Agent 看到和调用的是：
-
-```bash
-readonly/local-tools/review-site-runtime-by-device.sh suby1100008277
-```
-
-Agent 不需要知道 secret 文件在哪里，也不需要知道真实 Python package 的内部结构。Agent 需要先读取同名说明文件，例如 `review-site-runtime-by-device.readme.md`，了解参数、限制和使用场景。
-
-## Wrapper 和说明文件生成规则
-
-`readonly/local-tools/` 下不放综合 README。原因是未来 wrapper 由平台按用户权限自动生成，工具可见性应由文件对本身表达，避免综合 README 与实际 wrapper 列表发生漂移。
-
-每个可调用工具由一对同名文件组成：
-
-```text
-<tool-name>.sh
-<tool-name>.readme.md
-```
-
-例如：
-
-```text
-review-site-runtime-by-device.sh
-review-site-runtime-by-device.readme.md
-
-query-ocpp-sequence.sh
-query-ocpp-sequence.readme.md
-```
-
-如果同一平台下 tool 数量较多，可以使用平台级 grouped wrapper，通过 subcommand 区分方法。为了控制风险，推荐至少按读写分组：
+wrapper 是 agent 可见的能力边界，通常按平台和风险分组：
 
 ```text
 atlassian-read.sh
-atlassian-read.readme.md
-
 atlassian-write.sh
-atlassian-write.readme.md
+databricks-read.sh
+driivz-read.sh
 ```
 
-例如：
+规则：
 
-```bash
-readonly/local-tools/atlassian-read.sh search-tickets ...
-readonly/local-tools/atlassian-read.sh read-ticket ...
-readonly/local-tools/atlassian-read.sh search-wiki-pages ...
-readonly/local-tools/atlassian-read.sh read-wiki-page ...
-
-readonly/local-tools/atlassian-write.sh create-wiki-child-page ...
-readonly/local-tools/atlassian-write.sh update-wiki-page ...
-```
-
-读写 wrapper 分离后：
-
-- read wrapper 只包含查询和读取类 subcommands。
+- read wrapper 只包含查询、读取、诊断类 subcommands。
 - write wrapper 包含创建、更新、评论、上传附件等会修改外部系统的 subcommands。
-- wrapper 仍然固定写入当前 `user_id`，调用方不传 `--user-id`。
-- `.readme.md` 必须列出该 grouped wrapper 支持的 subcommands、参数、风险等级和示例。
-- 未来如需更细权限，可在 Python CLI 或 wrapper 生成策略中按 subcommand 校验。
+- `Tool.mode` 必须与 wrapper 风险一致。会修改外部系统的方法不能标记为 `read`。
+- 授权粒度是 `server_id + wrapper_id + subcommand`。
+- `requires_user_id` 是兼容字段；当前 broker/config 方案下应为 `false`，不代表 credential lookup。
+- wrapper 由 `ubi-ai` 根据 catalog、用户授权和 invocation token 动态 materialize，本仓库不发布用户目录下的 `.sh` 文件。
 
-Grouped wrapper 的 `.readme.md` 不应承载所有 subcommand 的完整说明，避免 prompt 注入内容过长。推荐使用两层文档：
+## Subcommand 文档规范
 
-```text
-readonly/local-tools/
-  atlassian-read.sh
-  atlassian-read.readme.md
-  atlassian-write.sh
-  atlassian-write.readme.md
-  docs/
-    atlassian/
-      search-tickets.md
-      read-ticket.md
-      search-wiki-pages.md
-      read-wiki-page.md
-      create-wiki-child-page.md
-      update-wiki-page.md
-```
-
-同名 `.readme.md` 作为轻量索引，只包含：
-
-- wrapper 是 read 还是 write；
-- 通用命令格式，例如 `<wrapper>.sh <subcommand> [args...]`；
-- 支持的 subcommand 列表；
-- 每个 subcommand 的一句话用途；
-- 对应详细说明文档路径；
-- 使用前必须读取目标 subcommand 详细文档的要求；
-- write wrapper 的外部系统修改风险提醒。
-
-详细参数、限制、示例、输出字段说明放在 `docs/<platform>/<subcommand>.md` 中。AgentRuntime prompt 只需要告诉 agent 先读取 wrapper 同名 readme，再按 readme 引用读取目标 subcommand 文档，不把所有 subcommand 细节直接注入 prompt。
-
-## Tool Docstring Metadata
-
-未来 wrapper index README、subcommand 详细说明和平台 tool registry 应从公开 tool/subcommand 方法的 docstring metadata 生成，而不是手工维护多份文档。内部规范见 `design/LOCAL_TOOL_DOCSTRING_METADATA.md`。
-
-该规范固定少量机器可解析块：
+公开给 agent 的每个 subcommand 必须有对应文档：
 
 ```text
-Tool
-When to use
-Parameters
-Examples
-Output
-Safety
+servers/<server_id>/published/doc/<wrapper_id>/<subcommand>.md
 ```
 
-平台生成器的大致解析流程：
+文档应由公开方法的 docstring metadata 维护，至少包含：
 
-1. 从 CLI registry 或显式 tool registry 找到公开 subcommands。
-2. 读取对应 Python callable 的函数签名、类型注解和默认值。
-3. 读取 docstring，并按固定块名解析 `Tool`、`When to use`、`Parameters`、`Examples`、`Output`、`Safety`。
-4. 校验 `Tool.name`、`Tool.wrapper`、`Tool.mode`、`Tool.summary` 等必填 metadata。
-5. 校验 `Parameters` 块和真实函数签名一致。
-6. 按 `Tool.wrapper` 分组生成 grouped wrapper index README。
-7. 按 `Tool.platform` 和 `Tool.name` 生成 `docs/<platform>/<subcommand>.md` 详细说明。
-8. 如果 docstring 缺失必填块或 metadata 与 CLI 注册不一致，构建或发布流程失败。
+- `When to use`：何时使用该 tool。
+- `Parameters`：参数名、业务含义、枚举、默认值和限制。
+- `Examples`：wrapper 调用示例，不包含 `--user-id`、token、password 或 track id。
+- `Output`：关键 JSON 字段和解释。
+- `Safety`：读写风险、外部系统影响和安全边界。
 
-解析实现可以复用 `griffe`、`docstring-parser` 或等价 Python docstring 解析库。若库不能直接理解自定义块，生成器可以先取得 docstring 原文，再按固定块标题做轻量切分；业务语义以 `design/LOCAL_TOOL_DOCSTRING_METADATA.md` 为准。
+详细规范见 `design/LOCAL_TOOL_DOCSTRING_METADATA.md`。当前没有专门发布命令；Codex/agent 修改公开 tool 时必须同步维护 published catalog 和 doc 文件。
 
-生成要求：
+## Settings 与 Credential 规则
 
-- `.sh` 是唯一可执行入口，文件存在表示该用户可以调用该 local tool。
-- 单命令 wrapper 的 `.readme.md` 是该 wrapper 的完整说明，必须与 `.sh` 同名。
-- grouped wrapper 的 `.readme.md` 是轻量索引；详细参数、限制、示例、输出字段说明放在 `docs/<platform>/<subcommand>.md`。
-- `.sh` 内固定写入当前 `user_id`，调用方不传 `--user-id`。
-- `.sh` 使用对应工具代码目录自己的 `.venv/bin/python`，不使用统一 runtime venv，也不依赖 `uv run`。
-- `.sh` 不写入 token、password、secret 文件路径或其他敏感值。
+每个 server 的 Settings 是读取环境变量和构造 typed config 的唯一边界。
 
-AgentRuntime 的提示词应告诉 agent：
+生产 local tool 路径中：
 
-```text
-User-approved local tools may exist under readonly/local-tools/.
-Each callable tool is a .sh file.
-Before using a tool, read its same-name .readme.md file.
-For grouped wrappers, read the referenced docs/<platform>/<subcommand>.md before calling a subcommand.
-Do not pass --user-id; wrappers already bind the current user.
-```
+- Settings 只读取 broker 注入的环境变量和允许的本地 runtime settings。
+- 服务层、client、业务函数不直接读取环境变量。
+- CLI 不接受 credential 参数、secret 路径或 `--user-id`。
+- 缺少 required config 时返回明确错误，不提 `personal-secrets.env`。
+- `.env`/`*_ENV_FILE` 可以作为本地开发便利保留，但不代表 production credential lookup 模型。
 
-## Secret 约定
+## 安全要求
 
-每个用户有自己的 secret 目录，目录下只放一个用户级 personal secrets 文件：
+- 不在代码、catalog、published docs、README、测试夹具或示例中写真实 token/password。
+- 不在 wrapper、命令行参数、stdout、stderr、日志或 JSON result 中输出 secret。
+- 公开参数必须是业务参数；不得暴露任意 SQL、任意 JQL/CQL、任意 URL、任意 Python 表达式或 shell 片段，除非对应 tool 的安全设计明确允许并限制。
+- write tool 的 docstring `Safety` 必须说明会修改哪个外部系统、修改范围和失败语义。
+- 查询类 tool 应设置合理 limit/window，避免一次返回过大的外部数据。
+- 对外部 API、数据库、HTTP client 的异常要转换为明确失败，不泄露 secret。
 
-```text
-ubi-personal-assistant-data/users/<user_id>/secrets/personal-secrets.env
-```
+## 新增或更新 Local Tool Checklist
 
-该文件按平台定义标准环境变量。多个 local tool 命令可以复用同一组平台凭据，不为每个 MCP 或每个命令单独创建 env 文件。
+当新增或更新 local tool 时，agent 必须检查：
 
-示例结构：
+1. 公开方法签名只包含业务参数。
+2. docstring metadata 符合 `design/LOCAL_TOOL_DOCSTRING_METADATA.md`。
+3. CLI subcommand 名称与 `Tool.name`、catalog subcommand 名称一致。
+4. wrapper 分组和 `mode` 与风险一致。
+5. Settings 中的 env key 与 `published/catalog.json` 的 `config_keys` 一致。
+6. `config_keys[].scope/secret/required` 变更不会静默破坏已有配置；如果 secret 语义改变，需要人工迁移方案。
+7. `published/doc` 示例不包含 `--user-id`、token、password、secret 文件路径或 track id。
+8. 单元测试覆盖 Settings 缺配置、CLI 参数、核心业务行为和安全限制。
+9. 受影响 server 通过 commit guideline 中的 ruff、pytest、bandit、pip-audit gate，或在提交说明中解释未运行原因。
 
-```text
-# Driivz CPMS
-DRIIVZ_BASE_URL=...
-DRIIVZ_USERNAME=...
-DRIIVZ_PASSWORD=...
+## 与 ubi-ai 的契约
 
-# Datawarehouse
-DATABRICKS_SERVER_HOSTNAME=...
-DATABRICKS_HTTP_PATH=...
-DATABRICKS_TOKEN=...
+`ubi-ai` 依赖本仓库发布产物来完成运行时工作：
 
-# Salesforce
-SALESFORCE_CLIENT_ID=...
-SALESFORCE_CLIENT_SECRET=...
-SALESFORCE_USERNAME=...
+- 扫描 `servers/<server_id>/published/catalog.json`。
+- 用 `server_id + wrapper_id + subcommand` 展示和保存用户授权。
+- 根据 `config_keys` 展示 user/system 配置 UI。
+- materialize 用户可见 wrapper/readme/doc。
+- broker 执行 `<server_root>/.venv/bin/python -m <python_module> <subcommand> [args...]`。
 
-# Atlassian
-ATLASSIAN_BASE_URL=...
-ATLASSIAN_EMAIL=...
-ATLASSIAN_API_TOKEN=...
-```
-
-推荐权限：
-
-```bash
-chmod 700 users/<user_id>/secrets
-chmod 600 users/<user_id>/secrets/personal-secrets.env
-```
-
-Secret 文件不放在以下目录：
-
-```text
-shared/
-users/<user_id>/workspace/
-users/<user_id>/readonly/
-users/<user_id>/attachments/
-```
-
-这些目录可能被 agent 看到或使用。
-
-## Settings 约定
-
-真实 Python tool 需要知道平台 runtime data root。
-
-建议配置：
-
-```text
-UBI_AI_AGENT_ROOT=/Users/F.Bai/Documents/Cursor Projects/ubi-personal-assistant-data
-```
-
-工具根据 `--user-id` 推导 secret 路径：
-
-```text
-{UBI_AI_AGENT_ROOT}/users/{user_id}/secrets/personal-secrets.env
-```
-
-工具自己的 `Settings` 集中负责 secret 解析，业务函数和 client 不直接读取环境变量或 secret 文件。credential 解析顺序：
-
-```text
-1. 优先使用真实运行环境变量中已经注入的标准平台 credential。
-2. 如果 credential 不完整，并且调用方提供了 user_id，则根据 UBI_AI_AGENT_ROOT 和 user_id 读取 personal-secrets.env 补齐。
-3. 如果仍不完整，则由 client/auth 校验返回明确失败。
-```
-
-例如 Driivz 工具读取 `DRIIVZ_*` credential，Datawarehouse 工具读取 `DATABRICKS_*` credential，Salesforce 工具读取 `SALESFORCE_*` credential，Atlassian 工具读取 `ATLASSIAN_*` credential。未来如果每个用户运行在自己的 Docker/container 中，平台可以直接把同一组标准 credential 变量注入容器；本地 local tool 模式下则使用 personal secrets 文件作为 fallback。
-
-实现要求：
-
-- 不在工具代码中硬编码 token。
-- 不在 wrapper 中写 token。
-- 不在 stdout、stderr、日志或 JSON result 中输出 token。
-- Settings/Config 负责集中读取 env，不在业务函数中散落读取环境变量。
-- local tool 命令之间可以复用同一平台凭据，但不能跨用户复用 personal secrets 文件。
-- 不从 wrapper 参数读取 password、token 或 secret 文件路径。
-
-## 权限模型
-
-核心规则：
-
-```text
-某用户 readonly/local-tools 下有哪些 wrapper
-  = 该用户有哪些 local tools 可见和可调用
-```
-
-例如：
-
-```text
-users/andreas.../readonly/local-tools/review-site-runtime-by-device.sh
-```
-
-表示 Andreas 用户可以使用 Driivz CPMS runtime review。
-
-如果某用户没有 Salesforce 权限，则不要在该用户的 `readonly/local-tools/` 下生成 Salesforce wrapper。
-
-该方案把 MCP 的“tool 可见性控制”转换为文件系统层面的“用户级 wrapper 可见性控制”。
-
-## 安全边界
-
-- `shared/` 不放真实工具入口，避免所有用户都看到所有工具。
-- `readonly/local-tools/` 只放 wrapper 和说明文件，不放 secret。
-- `secrets/` 不加入 Copilot CLI 的 `--add-dir`。
-- 真实工具代码不加入 Copilot CLI 的 `--add-dir`。
-- 工具只接受白名单参数，不接受任意 URL、任意 SQL、任意 Python 表达式。
-- 工具输出 JSON，避免输出大段日志和敏感信息。
-- wrapper 应尽量薄，只负责传递固定 user id 和调用真实工具。
-
-## 与 MCP 的关系
-
-该 local tool 方案是 MCP 被组织策略禁用后的过渡方案，不改变业务 tool 的核心语义。
-
-核心业务函数应保持可复用：
-
-```text
-review_site_runtime_by_device(device_id, include_recent_sessions)
-```
-
-未来可以有两个 adapter：
-
-```text
-local CLI wrapper adapter
-stdio MCP server adapter
-```
-
-当 Copilot policy 允许 MCP 后，可以继续用同一套 client/tools 代码包装成 MCP server。
-
-## 待确认问题
-
-- wrapper 由平台自动生成，还是先手工放到用户 `readonly/local-tools/`？
-- `UBI_AI_AGENT_ROOT` 是由 wrapper 固定传入，还是由部署环境统一注入？
-- 是否需要一个 `ubi-tool-runner` gatekeeper 来进一步校验 user/tool 权限？
-- wrapper 是否需要记录审计日志，例如 user、tool、参数摘要、执行时间、成功/失败？
+因此，本仓库的 catalog 和 published docs 是运行时契约，不是普通说明文字。更新公开 tool 行为时必须同步维护它们。
